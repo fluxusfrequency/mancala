@@ -39,25 +39,51 @@ end
 
 class MancalaGameView
   attr_reader :app
+  attr_accessor :random_colors
 
   def initialize(app)
     @app ||= app
+    @random_colors ||= []
+    build_random_colors
+  end
+
+  def build_random_colors
+    10.times do
+      random_colors << [rand(256), rand(256), rand(256)]
+    end
+  end
+
+  def stroke_a_random_color(num)
+    puts "random_colors"
+    app.stroke(random_colors[num][0], random_colors[num][1], random_colors[num][2])
   end
 
   def draw_game
+    stroke_a_random_color(0)
     app.ellipse 100, 125, 25, 25
+    stroke_a_random_color(1)
     app.ellipse 150, 125, 25, 25
+    stroke_a_random_color(2)
     app.ellipse 100, 175, 25, 25
+    stroke_a_random_color(4)
     app.ellipse 150, 175, 25, 25
 
+    stroke_a_random_color(5)
     app.ellipse 225, 125, 25, 25
+    stroke_a_random_color(6)
     app.ellipse 275, 125, 25, 25
+    stroke_a_random_color(7)
     app.ellipse 225, 175, 25, 25
+    stroke_a_random_color(8)
     app.ellipse 275, 175, 25, 25
 
+    stroke_a_random_color(9)
     app.ellipse 350, 125, 25, 25
+    stroke_a_random_color(0)
     app.ellipse 400, 125, 25, 25
+    stroke_a_random_color(1)
     app.ellipse 350, 175, 25, 25
+    stroke_a_random_color(2)
     app.ellipse 400, 175, 25, 25
 
     app.ellipse 500, 125, 25, 25
