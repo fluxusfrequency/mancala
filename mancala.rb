@@ -37,9 +37,15 @@ class MancalaPitController
   end
 
   def add_bead_to_pit(pit)
-    puts pit.count
     pit.count += 1
-    puts pit.count
+  end
+
+  def remove_bead_from_pit(pit)
+    pit.count -= 1
+  end
+
+  def add_bead_to_store(store)
+    store.count += 1
   end
 
   def empty_pit(pit)
@@ -77,7 +83,19 @@ class MancalaPitController
   end
 
   def find_next_pit(first_pit)
-    all.find {|pit| pit.id == first_pit.id + 1}
+    if first_pit.id == 12
+      all.find {|pit| pit.id == 1}
+    else
+      all.find {|pit| pit.id == first_pit.id + 1}
+    end
+  end
+
+  def find_last_pit(first_pit)
+    if first_pit.id == 1
+      all.find {|pit| pit.id == 12}
+    else
+      all.find {|pit| pit.id == first_pit.id - 1}
+    end
   end
 
   def all
@@ -93,6 +111,10 @@ class MancalaPitController
               pit10,
               pit11,
               pit12]
+  end
+
+  def all_stores
+    @all_stores ||= [player_1_store, player_2_store]
   end
 
   def setup_pits
@@ -147,7 +169,8 @@ class MancalaStore
   # Am I empty?
   # Which player do I belong to?
 
-  attr_reader :id, :count
+  attr_reader :id
+  attr_accessor :count
 
   def initialize(id)
     @count ||= 0
@@ -203,7 +226,7 @@ class MancalaBoardView
   end
 
   def draw_title
-    app.text "MANCALA", 628, 25
+    app.text "MANCALA", 685, 25
   end
 
 end
@@ -237,6 +260,9 @@ class MancalaGameView
     app.pit_controller.all.each do |pit|
       draw_beads_in_pit(pit)
     end
+    app.pit_controller.all_stores.each do |store|
+      draw_beads_in_store(store)
+    end
   end
 
   def draw_beads_in_pit(pit)
@@ -257,14 +283,26 @@ class MancalaGameView
   def redraw_pits_starting_from(first_pit)
     draw_no_beads(first_pit)
     next_pit = app.pit_controller.find_next_pit(first_pit)
-    for i in 1..first_pit.count do
-      puts "hello"
-      #  !!!!!!!!!!!! FIX HERE !!!!!!!!!!!!
+    pits_to_fill = first_pit.count
+    @hit_a_store = false
+    for i in 1..pits_to_fill do
+      if app.ruler.current_player.id == 1 && next_pit.id == 7
+        app.pit_controller.add_bead_to_store(app.pit_controller.player_1_store)
+        draw_bead_in_store(app.pit_controller.player_1_store)
+        @hit_a_store = true
+      elsif app.ruler.current_player.id == 2 && next_pit.id == 1
+        app.pit_controller.add_bead_to_store(app.pit_controller.player_2_store)
+        draw_bead_in_store(app.pit_controller.player_2_store)
+        @hit_a_store = true
+      end
       app.pit_controller.add_bead_to_pit(next_pit)
-      puts next_pit.id
       draw_beads_in_pit(next_pit)
       next_pit = app.pit_controller.find_next_pit(next_pit)
-      puts next_pit.id
+    end
+    if @hit_a_store
+      last_pit = app.pit_controller.find_last_pit(next_pit)
+      app.pit_controller.remove_bead_from_pit(last_pit)
+      draw_beads_in_pit(next_pit)
     end
   end
 
@@ -287,9 +325,9 @@ class MancalaGameView
   def draw_three_beads(pit)
     # [x, y+37], [x-37, y-37], [x-37, y+37]
     fill_a_random_color(4)
-    app.ellipse pit.x, pit.y+37, 25, 25
+    app.ellipse pit.x, pit.y, 25, 25
     fill_a_random_color(5)
-    app.ellipse pit.x-37, pit.y-37, 25, 25
+    app.ellipse pit.x+37, pit.y-37, 25, 25
     fill_a_random_color(6)
     app.ellipse pit.x-37, pit.y+37, 25, 25
   end
@@ -360,15 +398,71 @@ class MancalaGameView
     app.ellipse pit.x-12, pit.y+12, 25, 25
     fill_a_random_color(10)
     app.ellipse pit.x-25, pit.y+25, 25, 25
-    fill_a_random_color(10)
+    fill_a_random_color(11)
     app.ellipse pit.x-37, pit.y+37, 25, 25
+    fill_a_random_color(12)
+    app.ellipse pit.x+37, pit.y-37, 25, 25
+    fill_a_random_color(1)
+    app.ellipse pit.x+25, pit.y-25, 25, 25
+    fill_a_random_color(2)
+    app.ellipse pit.x+12, pit.y-12, 25, 25
+    fill_a_random_color(3)
+    app.ellipse pit.x, pit.y, 25, 25
+    fill_a_random_color(4)
+    app.ellipse pit.x+12, pit.y-12, 25, 25
+    fill_a_random_color(5)
+    app.ellipse pit.x+25, pit.y-25, 25, 25
+    fill_a_random_color(6)
+    app.ellipse pit.x+37, pit.y-37, 25, 25
+
+    app.fill 0
+    app.textSize(56)
+    app.text "#{pit.count}", pit.x-10, pit.y-25
+  end
+
+  def draw_beads_in_store(store)
+    fill_a_random_color(1)
+    if store.id == 1
+      draw_beads_in_player_one_store
+    elsif store.id == 2
+      draw_beads_in_player_two_store
+    end
+  end
+
+  def draw_beads_in_player_one_store
+    count =  app.pit_controller.player_1_store.count
+    case count
+    when 0
+      return
+    when 1
+      app.ellipse 1330, 250, 25, 25
+    else
+      app.fill 0
+      app.textSize(56)
+      app.text "#{count}", 1290, 250
+    end
+  end
+
+  def draw_beads_in_player_two_store
+    count = app.pit_controller.player_2_store.count
+    case count
+    when 0
+      return
+    when 1
+      app.ellipse 130, 250, 25, 25
+    else
+      app.fill 0
+      app.textSize(56)
+      app.text "#{count}", 90, 250
+    end
   end
 
   def invite_move
     app.background 0,0,0
+    app.textSize(20)
     app.fill 256, 256, 256
-    app.text "  -     Player one, your move!", 700, 25 if app.ruler.current_player.id == 1
-    app.text "  -     Player two, your move!", 700, 25 if app.ruler.current_player.id == 2
+    app.text "Player one, your move!", 640, 475 if app.ruler.current_player.id == 1
+    app.text "Player two, your move!", 640, 475 if app.ruler.current_player.id == 2
   end
 
 end
