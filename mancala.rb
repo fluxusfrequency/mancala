@@ -1,6 +1,11 @@
 require 'ruby-processing'
 
 class MancalaPitController
+
+  # Maybe this is a model?
+  # Which pits are in this game?
+  # Which stores are in this game?
+
   attr_reader :app
   attr_accessor :pit1,
                 :pit2,
@@ -14,7 +19,7 @@ class MancalaPitController
                 :pit10,
                 :pit11,
                 :pit12,
-                :player_1_store
+                :player_1_store,
                 :player_2_store
 
   def initialize(app)
@@ -35,7 +40,8 @@ class MancalaPitController
     pit.count = 0
   end
 
-  def take_if_available(pit)
+  def take_if_available
+    pit = find_pit_by_coordinates(coordinates)
     pit.empty?
     app.model.take_pit
   end
@@ -43,7 +49,7 @@ class MancalaPitController
   def location_for_number_of_beads(n)
     case n
     when 1 then [[x, y]]
-    when 2 then [[x-37, y] [x+37, y]]
+    when 2 then [[x-37, y], [x+37, y]]
     when 3 then [[x, y+37], [x-37, y-37], [x-37, y+37]]
     when 4 then [[x-37, y-37], [x+37, y-37], [x-37, y+37], [x+37, y+37]]
     else
@@ -67,31 +73,38 @@ class MancalaPitController
   end
 
   def setup_pits
-    @pit1 = MancalaPit.new([285, 350])
-    @pit2 = MancalaPit.new([455, 350])
-    @pit3 = MancalaPit.new([625, 350])
-    @pit4 = MancalaPit.new([795, 350])
-    @pit5 = MancalaPit.new([965, 350])
-    @pit6 = MancalaPit.new([1135, 350])
-    @pit7 = MancalaPit.new([1135, 150])
-    @pit8 = MancalaPit.new([965, 150])
-    @pit9 = MancalaPit.new([795, 150])
-    @pit10 = MancalaPit.new([625, 150])
-    @pit11 = MancalaPit.new([455, 150])
-    @pit12 = MancalaPit.new([285, 150])
+    @pit1 = MancalaPit.new(1, [285, 350])
+    @pit2 = MancalaPit.new(2, [455, 350])
+    @pit3 = MancalaPit.new(3, [625, 350])
+    @pit4 = MancalaPit.new(4, [795, 350])
+    @pit5 = MancalaPit.new(5, [965, 350])
+    @pit6 = MancalaPit.new(6, [1135, 350])
+    @pit7 = MancalaPit.new(7, [1135, 150])
+    @pit8 = MancalaPit.new(8, [965, 150])
+    @pit9 = MancalaPit.new(9, [795, 150])
+    @pit10 = MancalaPit.new(10, [625, 150])
+    @pit11 = MancalaPit.new(11, [455, 150])
+    @pit12 = MancalaPit.new(12, [285, 150])
   end
 
   def setup_stores
-    @player_1_store = MancalaStore.new(115)
-    @player_2_store = MancalaStore.new(1305)
+    @player_1_store = MancalaStore.new(1)
+    @player_2_store = MancalaStore.new(2)
   end
 
 end
 
 class MancalaPit
-  attr_reader :location, :x, :y, :count
 
-  def initialize(location)
+  # What is my id?
+  # What are my coordinates?
+  # How many pieces do I currently contain?
+  # Am I empty?
+
+  attr_reader :id, :location, :x, :y, :count
+
+  def initialize(id, location)
+    @id = id
     @location = location
     @x = location[0]
     @y = location[1]
@@ -105,15 +118,33 @@ class MancalaPit
 end
 
 class MancalaStore
-  attr_reader :count
 
-  def initialize(location)
+  # How many pieces do I currently contain?
+  # Am I empty?
+  # Which player do I belong to?
+
+  attr_reader :id, :count
+
+  def initialize(id)
     @count ||= 0
+    @id = id
+  end
+
+  def empty?
+    count == 0
+  end
+
+  def player
+    app.players.select{|player| player.id == player_id}
   end
 
 end
 
 class MancalaBoardView
+
+  # What does the board look like?
+  # What do the pits look like?
+  # What do the stores look like?
 
   attr_reader :app
 
@@ -154,6 +185,11 @@ class MancalaBoardView
 end
 
 class MancalaGameView
+
+  # What do the beads look like?
+  # How do I render a pit with
+  # 0,1,2,3,4,5,6,7,8 or more beads?
+
   attr_reader :app
   attr_accessor :random_colors
 
@@ -195,6 +231,11 @@ class MancalaGameView
     end
   end
 
+  def invite_move
+    app.fill 256, 256, 256
+    app.text "  -     Player one, your move!", 700, 25
+  end
+
   # def redraw_pit(pit)
   #   app.pit_controller.return_location_of_pit(pit)
   # end
@@ -202,32 +243,67 @@ class MancalaGameView
 end
 
 class MancalaModel
+
+  # How many pieces are in the current player's store?
+  # How many pieces are in the opponent's store?
+  # How many pieces are in each pit? (hash)
+
   attr_reader :app
-  attr_accessor :all_pits
+  attr_accessor :all_pits, :player_1_store, :player_2_store
 
   def initialize(app)
     @app ||= app
     @pit_controller ||= app.pit_controller
     @all_pits = pit_controller.all
+    @player_1_store = 0
+    @player_2_store = 0
   end
 
   def available_pits
-    all_pits - taken_pits
+    all_pits - empty_pits
   end
 
-  def players_inventory(player)
+  def store_count_of(player)
+    player_1_store if player.id == 1
+    player_2_store if player.id == 2
+  end
 
+  def empty_pits
+    pit_controller.empty_pits
+  end
+
+  def current_players_store_count
+    store_count_of(app.ruler.current_player)
+  end
+
+  def opponents_store_count
+    if app.ruler.current_player == app.player_1
+      opponent = app.player_2
+    else
+      opponent = app.player_1
+    end
+      store_count_of(opponent)
   end
 
   def take_pit(pit)
     pit_controller.return_count_of_pit(pit)
     # do some stuff with the beads taken
+
     pit.controller.empty_pit(pit)
   end
 
 end
 
 class MancalaKalahRules
+
+  # Which direction do moves go?
+  # Which pits are legal moves?
+  # Where do the beads go when a player selects a pit?
+  # What happens if I land on a given pit?
+  # Is the game over?
+  # Where do leftover beads go if the game is over?
+  # Who won?
+
   attr_reader :app
   attr_accessor :current_player, :game_over
 
@@ -260,10 +336,27 @@ class MancalaKalahRules
 end
 
 class MancalaPlayer
+
+  # Which pits can I move from?
+  # Which store is mine?
+  # How many beads are in my store?
+
   attr_reader :id
 
   def initialize(id)
     @id = id
+  end
+
+  def my_pit_ids
+    if id == 1
+      [1, 2, 3, 4]
+    else
+      [5, 6, 7, 8]
+    end
+  end
+
+  def my_store_id
+    id
   end
 
 end
@@ -279,7 +372,7 @@ class Mancala < Processing::App
     @pit_controller = MancalaPitController.new(self)
     @board = MancalaBoardView.new(self)
     @view = MancalaGameView.new(self)
-    @model = MancalaModel.new(self)
+    # @model = MancalaModel.new(self)
     @ruler = MancalaKalahRules.new(self)
     @player_1 ||= ruler.create_player(1)
     @player_2 ||= ruler.create_player(2)
@@ -288,14 +381,19 @@ class Mancala < Processing::App
   def draw
     board.draw_board
     view.draw_beads
+    view.invite_move
   end
 
   def mouse_pressed
     position = [mouse_x, mouse_y]
-    pit_controller.take_if_available(pit)
+    pit_controller.take_pit_if_available(position)
     # check_for_win
     # change_player
   end
+
+  # def players
+  #   [player_1, player_2]
+  # end
 
 end
 
