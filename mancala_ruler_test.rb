@@ -3,17 +3,16 @@ require 'minitest/autorun'
 require 'minitest/pride'
 require './mancala.rb'
 
-class MancalaModelTest < Minitest::Test
+class MancalaRulerTest < Minitest::Test
 
-  attr_reader :app, :model
+  attr_reader :app, :ruler
 
   def setup
     @app = Mancala.new
-    @model = app.model
+    @ruler = app.ruler
   end
 
-  def test_it_exists
-    refute app.model.nil?
+  def test_it
   end
 
 end
