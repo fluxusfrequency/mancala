@@ -13,7 +13,9 @@ class MancalaPitController
                 :pit9,
                 :pit10,
                 :pit11,
-                :pit12
+                :pit12,
+                :player_1_store
+                :player_2_store
 
   def initialize(app)
     @app = app
@@ -21,7 +23,24 @@ class MancalaPitController
     setup_stores
   end
 
-  def location_for_number_of_pieces(n)
+  def return_location_of_pit(pit)
+    [pit.x, pit.y]
+  end
+
+  def return_count_of_pit(pit)
+    pit.count
+  end
+
+  def empty_pit(pit)
+    pit.count = 0
+  end
+
+  def take_if_available(pit)
+    pit.empty?
+    app.model.take_pit
+  end
+
+  def location_for_number_of_beads(n)
     case n
     when 1 then [[x, y]]
     when 2 then [[x-37, y] [x+37, y]]
@@ -63,12 +82,8 @@ class MancalaPitController
   end
 
   def setup_stores
-    @player_one_store = MancalaStore.new(115)
-    @player_two_store = MancalaStore.new(1305)
-  end
-
-  def return_attribues_for_pit(n)
-    pit"#{n}".attributes_for_build
+    @player_1_store = MancalaStore.new(115)
+    @player_2_store = MancalaStore.new(1305)
   end
 
 end
@@ -81,6 +96,10 @@ class MancalaPit
     @x = location[0]
     @y = location[1]
     @count ||= 4
+  end
+
+  def empty?
+    count == 0
   end
 
 end
@@ -121,19 +140,6 @@ class MancalaBoardView
     app.pit_controller.all.each do |pit|
       app.ellipse pit.x, pit.y, 150, 150
     end
-
-    # app.ellipse 285, 150, 150, 150
-    # app.ellipse 285, 350, 150, 150
-    # app.ellipse 455, 150, 150, 150
-    # app.ellipse 455, 350, 150, 150
-    # app.ellipse 625, 150, 150, 150
-    # app.ellipse 625, 350, 150, 150
-    # app.ellipse 795, 150, 150, 150
-    # app.ellipse 795, 350, 150, 150
-    # app.ellipse 965, 150, 150, 150
-    # app.ellipse 965, 350, 150, 150
-    # app.ellipse 1135, 150, 150, 150
-    # app.ellipse 1135, 350, 150, 150
   end
 
   def draw_stores
@@ -168,153 +174,104 @@ class MancalaGameView
     app.fill(random_colors[num][0], random_colors[num][1], random_colors[num][2])
   end
 
-  def draw_game
-    fill_a_random_color(0)
-    app.ellipse 260, 125, 25, 25
-    fill_a_random_color(1)
-    app.ellipse 310, 125, 25, 25
-    fill_a_random_color(2)
-    app.ellipse 260, 175, 25, 25
-    fill_a_random_color(3)
-    app.ellipse 310, 175, 25, 25
-
-    fill_a_random_color(4)
-    app.ellipse 430, 125, 25, 25
-    fill_a_random_color(5)
-    app.ellipse 480, 125, 25, 25
-    fill_a_random_color(6)
-    app.ellipse 430, 175, 25, 25
-    fill_a_random_color(7)
-    app.ellipse 480, 175, 25, 25
-
-    fill_a_random_color(8)
-    app.ellipse 600, 125, 25, 25
-    fill_a_random_color(9)
-    app.ellipse 650, 125, 25, 25
-    fill_a_random_color(10)
-    app.ellipse 600, 175, 25, 25
-    fill_a_random_color(11)
-    app.ellipse 650, 175, 25, 25
-
-    fill_a_random_color(12)
-    app.ellipse 770, 125, 25, 25
-    fill_a_random_color(13)
-    app.ellipse 820, 125, 25, 25
-    fill_a_random_color(14)
-    app.ellipse 770, 175, 25, 25
-    fill_a_random_color(15)
-    app.ellipse 820, 175, 25, 25
-
-    fill_a_random_color(16)
-    app.ellipse 940, 125, 25, 25
-    fill_a_random_color(17)
-    app.ellipse 990, 125, 25, 25
-    fill_a_random_color(18)
-    app.ellipse 940, 175, 25, 25
-    fill_a_random_color(19)
-    app.ellipse 990, 175, 25, 25
-
-    fill_a_random_color(20)
-    app.ellipse 1110, 125, 25, 25
-    fill_a_random_color(21)
-    app.ellipse 1160, 125, 25, 25
-    fill_a_random_color(22)
-    app.ellipse 1110, 175, 25, 25
-    fill_a_random_color(23)
-    app.ellipse 1160, 175, 25, 25
-
-    fill_a_random_color(24)
-    app.ellipse 260, 325, 25, 25
-    fill_a_random_color(25)
-    app.ellipse 310, 325, 25, 25
-    fill_a_random_color(26)
-    app.ellipse 260, 375, 25, 25
-    fill_a_random_color(27)
-    app.ellipse 310, 375, 25, 25
-
-    fill_a_random_color(28)
-    app.ellipse 430, 325, 25, 25
-    fill_a_random_color(29)
-    app.ellipse 480, 325, 25, 25
-    fill_a_random_color(30)
-    app.ellipse 430, 375, 25, 25
-    fill_a_random_color(31)
-    app.ellipse 480, 375, 25, 25
-
-    fill_a_random_color(32)
-    app.ellipse 600, 325, 25, 25
-    fill_a_random_color(33)
-    app.ellipse 650, 325, 25, 25
-    fill_a_random_color(34)
-    app.ellipse 600, 375, 25, 25
-    fill_a_random_color(35)
-    app.ellipse 650, 375, 25, 25
-
-    fill_a_random_color(36)
-    app.ellipse 770, 325, 25, 25
-    fill_a_random_color(37)
-    app.ellipse 820, 325, 25, 25
-    fill_a_random_color(38)
-    app.ellipse 770, 375, 25, 25
-    fill_a_random_color(39)
-    app.ellipse 820, 375, 25, 25
-
-    fill_a_random_color(40)
-    app.ellipse 940, 325, 25, 25
-    fill_a_random_color(41)
-    app.ellipse 990, 325, 25, 25
-    fill_a_random_color(42)
-    app.ellipse 940, 375, 25, 25
-    fill_a_random_color(43)
-    app.ellipse 990, 375, 25, 25
-
-    fill_a_random_color(44)
-    app.ellipse 1110, 325, 25, 25
-    fill_a_random_color(45)
-    app.ellipse 1160, 325, 25, 25
-    fill_a_random_color(46)
-    app.ellipse 1110, 375, 25, 25
-    fill_a_random_color(47)
-    app.ellipse 1160, 375, 25, 25
+  def draw_beads
+    app.pit_controller.all.each_with_index do |pit, i|
+      fill_a_random_color(i)
+      app.ellipse pit.x-25, 125, 25, 25
+      fill_a_random_color(i+1)
+      app.ellipse pit.x+25, 125, 25, 25
+      fill_a_random_color(i+2)
+      app.ellipse pit.x-25, 175, 25, 25
+      fill_a_random_color(i+3)
+      app.ellipse pit.x+25, 175, 25, 25
+      fill_a_random_color(i+4)
+      app.ellipse pit.x-25, 325, 25, 25
+      fill_a_random_color(i+5)
+      app.ellipse pit.x+25, 325, 25, 25
+      fill_a_random_color(i+6)
+      app.ellipse pit.x-25, 375, 25, 25
+      fill_a_random_color(i+7)
+      app.ellipse pit.x+25, 375, 25, 25
+    end
   end
+
+  # def redraw_pit(pit)
+  #   app.pit_controller.return_location_of_pit(pit)
+  # end
 
 end
 
 class MancalaModel
   attr_reader :app
+  attr_accessor :all_pits
 
   def initialize(app)
     @app ||= app
-    @current_player = 'x'
-    @game_over = false
+    @pit_controller ||= app.pit_controller
+    @all_pits = pit_controller.all
+  end
+
+  def available_pits
+    all_pits - taken_pits
+  end
+
+  def players_inventory(player)
+
+  end
+
+  def take_pit(pit)
+    pit_controller.return_count_of_pit(pit)
+    # do some stuff with the beads taken
+    pit.controller.empty_pit(pit)
   end
 
 end
 
 class MancalaKalahRules
   attr_reader :app
+  attr_accessor :current_player, :game_over
 
   def initialize(app)
     @app ||= app
-    # @current_player = :player_1
-    # @game_over = false
+    @game_over = false
   end
 
-  # def change_player
-  #   if @current_player == :player_1
-  #     @current_player = :player_2
-  #   else
-  #     @current_player = :player_1
-  #   end
-  # end
+  def create_player(n)
+    return unless n == 1 || 2
+    MancalaPlayer.new(n)
+  end
+
+  def current_player
+    @current_player ||= app.player_1
+  end
+
+  def change_player
+    if @current_player == app.player_1
+      @current_player = app.player_2
+    else
+      @current_player = app.player_1
+    end
+  end
+
+  def has_turn?(player)
+    player == current_player
+  end
 
 end
 
+class MancalaPlayer
+  attr_reader :id
 
+  def initialize(id)
+    @id = id
+  end
+
+end
 
 class Mancala < Processing::App
 
   attr_reader :board, :view, :model, :pit_controller, :ruler
+  attr_accessor :player_1, :player_2
 
   def setup
     size 1425, 500
@@ -324,11 +281,20 @@ class Mancala < Processing::App
     @view = MancalaGameView.new(self)
     @model = MancalaModel.new(self)
     @ruler = MancalaKalahRules.new(self)
+    @player_1 ||= ruler.create_player(1)
+    @player_2 ||= ruler.create_player(2)
   end
 
   def draw
     board.draw_board
-    view.draw_game
+    view.draw_beads
+  end
+
+  def mouse_pressed
+    position = [mouse_x, mouse_y]
+    pit_controller.take_if_available(pit)
+    # check_for_win
+    # change_player
   end
 
 end
