@@ -36,6 +36,12 @@ class MancalaPitController
     pit.count
   end
 
+  def add_bead_to_pit(pit)
+    puts pit.count
+    pit.count += 1
+    puts pit.count
+  end
+
   def empty_pit(pit)
     pit.count = 0
   end
@@ -44,14 +50,13 @@ class MancalaPitController
     return if coordinates[0] == 0 || coordinates[1] == 0
     found_pit = find_pit_by_coordinates(coordinates)
     if valid_move?(found_pit)
-      execute_take
+      execute_take(found_pit)
     end
   end
 
-  def execute_take
-    app.model.take_pit(found_pit)
+  def execute_take(pit)
+    app.model.take_pit(pit)
     app.ruler.change_player
-    app.view.redraw_pit(pit)
   end
 
   def valid_move?(pit)
@@ -71,7 +76,8 @@ class MancalaPitController
     @found
   end
 
-  def move_beads
+  def find_next_pit(first_pit)
+    all.find {|pit| pit.id == first_pit.id + 1}
   end
 
   def all
@@ -227,36 +233,135 @@ class MancalaGameView
     app.fill(random_colors[num][0], random_colors[num][1], random_colors[num][2])
   end
 
-  def draw_beads
-    app.pit_controller.all.each_with_index do |pit, i|
-      fill_a_random_color(i)
-      app.ellipse pit.x-25, 125, 25, 25
-      fill_a_random_color(i+1)
-      app.ellipse pit.x+25, 125, 25, 25
-      fill_a_random_color(i+2)
-      app.ellipse pit.x-25, 175, 25, 25
-      fill_a_random_color(i+3)
-      app.ellipse pit.x+25, 175, 25, 25
-      fill_a_random_color(i+4)
-      app.ellipse pit.x-25, 325, 25, 25
-      fill_a_random_color(i+5)
-      app.ellipse pit.x+25, 325, 25, 25
-      fill_a_random_color(i+6)
-      app.ellipse pit.x-25, 375, 25, 25
-      fill_a_random_color(i+7)
-      app.ellipse pit.x+25, 375, 25, 25
+  def draw_all_beads
+    app.pit_controller.all.each do |pit|
+      draw_beads_in_pit(pit)
     end
   end
 
-  def location_for_number_of_beads(n)
-    case n
-    when 1 then [[x, y]]
-    when 2 then [[x-37, y], [x+37, y]]
-    when 3 then [[x, y+37], [x-37, y-37], [x-37, y+37]]
-    when 4 then [[x-37, y-37], [x+37, y-37], [x-37, y+37], [x+37, y+37]]
+  def draw_beads_in_pit(pit)
+    app.fill 225
+    case pit.count
+    when 0 then draw_no_beads(pit)
+    when 1 then draw_one_bead(pit)
+    when 2 then draw_two_beads(pit)
+    when 3 then draw_three_beads(pit)
+    when 4 then draw_four_beads(pit)
+    when 5 then draw_five_beads(pit)
+    when 6 then draw_six_beads(pit)
     else
-      [[]]
+      draw_many_beads(pit)
     end
+  end
+
+  def redraw_pits_starting_from(first_pit)
+    draw_no_beads(first_pit)
+    next_pit = app.pit_controller.find_next_pit(first_pit)
+    for i in 1..first_pit.count do
+      puts "hello"
+      #  !!!!!!!!!!!! FIX HERE !!!!!!!!!!!!
+      app.pit_controller.add_bead_to_pit(next_pit)
+      puts next_pit.id
+      draw_beads_in_pit(next_pit)
+      next_pit = app.pit_controller.find_next_pit(next_pit)
+      puts next_pit.id
+    end
+  end
+
+  def draw_no_beads(pit)
+    app.ellipse pit.x, pit.y, 150, 150
+  end
+
+  def draw_one_bead(pit)
+    fill_a_random_color(1)
+    app.ellipse pit.x, pit.y, 25, 25
+  end
+
+  def draw_two_beads(pit)
+    fill_a_random_color(2)
+    app.ellipse pit.x-25, pit.y, 25, 25
+    fill_a_random_color(3)
+    app.ellipse pit.x+25, pit.y, 25, 25
+  end
+
+  def draw_three_beads(pit)
+    # [x, y+37], [x-37, y-37], [x-37, y+37]
+    fill_a_random_color(4)
+    app.ellipse pit.x, pit.y+37, 25, 25
+    fill_a_random_color(5)
+    app.ellipse pit.x-37, pit.y-37, 25, 25
+    fill_a_random_color(6)
+    app.ellipse pit.x-37, pit.y+37, 25, 25
+  end
+
+  def draw_four_beads(pit)
+    fill_a_random_color(7)
+    app.ellipse pit.x-25, pit.y-25, 25, 25
+    fill_a_random_color(8)
+    app.ellipse pit.x+25, pit.y-25, 25, 25
+    fill_a_random_color(9)
+    app.ellipse pit.x-25, pit.y+25, 25, 25
+    fill_a_random_color(10)
+    app.ellipse pit.x+25, pit.y+25, 25, 25
+  end
+
+  def draw_five_beads(pit)
+    fill_a_random_color(11)
+    app.ellipse pit.x-37, pit.y-37, 25, 25
+    fill_a_random_color(12)
+    app.ellipse pit.x+37, pit.y-37, 25, 25
+    fill_a_random_color(1)
+    app.ellipse pit.x-37, pit.y+37, 25, 25
+    fill_a_random_color(2)
+    app.ellipse pit.x+37, pit.y+37, 25, 25
+    fill_a_random_color(3)
+    app.ellipse pit.x, pit.y, 25, 25
+  end
+
+  def draw_six_beads(pit)
+    fill_a_random_color(4)
+    app.ellipse pit.x-37, pit.y-37, 25, 25
+    fill_a_random_color(5)
+    app.ellipse pit.x, pit.y-37, 25, 25
+    fill_a_random_color(6)
+    app.ellipse pit.x+37, pit.y-37, 25, 25
+    fill_a_random_color(7)
+    app.ellipse pit.x-37, pit.y+37, 25, 25
+    fill_a_random_color(8)
+    app.ellipse pit.x, pit.y+37, 25, 25
+    fill_a_random_color(9)
+    app.ellipse pit.x+37, pit.y+37, 25, 25
+  end
+
+  def draw_many_beads(pit)
+    fill_a_random_color(10)
+    app.ellipse pit.x-37, pit.y-37, 25, 25
+    fill_a_random_color(11)
+    app.ellipse pit.x-25, pit.y-25, 25, 25
+    fill_a_random_color(12)
+    app.ellipse pit.x-12, pit.y-12, 25, 25
+    fill_a_random_color(1)
+    app.ellipse pit.x, pit.y, 25, 25
+    fill_a_random_color(2)
+    app.ellipse pit.x+12, pit.y+12, 25, 25
+    fill_a_random_color(3)
+    app.ellipse pit.x+25, pit.y+25, 25, 25
+    fill_a_random_color(4)
+    app.ellipse pit.x+37, pit.y+37, 25, 25
+    fill_a_random_color(5)
+    app.ellipse pit.x-37, pit.y+37, 25, 25
+    fill_a_random_color(6)
+    app.ellipse pit.x-25, pit.y+25, 25, 25
+    fill_a_random_color(7)
+    app.ellipse pit.x-12, pit.y+12, 25, 25
+    fill_a_random_color(8)
+    app.ellipse pit.x, pit.y, 25, 25
+    fill_a_random_color(9)
+    app.ellipse pit.x-12, pit.y+12, 25, 25
+    fill_a_random_color(10)
+    app.ellipse pit.x-25, pit.y+25, 25, 25
+    fill_a_random_color(10)
+    app.ellipse pit.x-37, pit.y+37, 25, 25
   end
 
   def invite_move
@@ -265,16 +370,6 @@ class MancalaGameView
     app.text "  -     Player one, your move!", 700, 25 if app.ruler.current_player.id == 1
     app.text "  -     Player two, your move!", 700, 25 if app.ruler.current_player.id == 2
   end
-
-  def redraw_pit(pit)
-    app.ellipse pit.x, pit.y, 150, 150
-  end
-
-  # def draw_pits
-  #   app.pit_controller.all.each do |pit|
-  #     app.ellipse pit.x, pit.y, 150, 150
-  #   end
-  # end
 
 end
 
@@ -322,7 +417,7 @@ class MancalaModel
   end
 
   def take_pit(pit)
-    @current_count = pit_controller.return_count_of_pit(pit)
+    app.view.redraw_pits_starting_from(pit)
     pit_controller.empty_pit(pit)
   end
 
@@ -424,7 +519,7 @@ class Mancala < Processing::App
   def draw
     view.invite_move
     board.draw_board
-    view.draw_beads
+    view.draw_all_beads
   end
 
   def mouse_pressed
