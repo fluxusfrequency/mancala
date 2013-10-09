@@ -1,5 +1,99 @@
 require 'ruby-processing'
 
+class MancalaPitController
+  attr_reader :app
+  attr_accessor :pit1,
+                :pit2,
+                :pit3,
+                :pit4,
+                :pit5,
+                :pit6,
+                :pit7,
+                :pit8,
+                :pit9,
+                :pit10,
+                :pit11,
+                :pit12
+
+  def initialize(app)
+    @app = app
+    setup_pits
+    setup_stores
+  end
+
+  def location_for_number_of_pieces(n)
+    case n
+    when 1 then [[x, y]]
+    when 2 then [[x-37, y] [x+37, y]]
+    when 3 then [[x, y+37], [x-37, y-37], [x-37, y+37]]
+    when 4 then [[x-37, y-37], [x+37, y-37], [x-37, y+37], [x+37, y+37]]
+    else
+      [[]]
+    end
+  end
+
+  def all
+    @all ||= [pit1,
+              pit2,
+              pit3,
+              pit4,
+              pit5,
+              pit6,
+              pit7,
+              pit8,
+              pit9,
+              pit10,
+              pit11,
+              pit12]
+  end
+
+  def setup_pits
+    @pit1 = MancalaPit.new([285, 350])
+    @pit2 = MancalaPit.new([455, 350])
+    @pit3 = MancalaPit.new([625, 350])
+    @pit4 = MancalaPit.new([795, 350])
+    @pit5 = MancalaPit.new([965, 350])
+    @pit6 = MancalaPit.new([1135, 350])
+    @pit7 = MancalaPit.new([1135, 150])
+    @pit8 = MancalaPit.new([965, 150])
+    @pit9 = MancalaPit.new([795, 150])
+    @pit10 = MancalaPit.new([625, 150])
+    @pit11 = MancalaPit.new([455, 150])
+    @pit12 = MancalaPit.new([285, 150])
+  end
+
+  def setup_stores
+    @player_one_store = MancalaStore.new(115)
+    @player_two_store = MancalaStore.new(1305)
+  end
+
+  def return_attribues_for_pit(n)
+    pit"#{n}".attributes_for_build
+  end
+
+end
+
+class MancalaPit
+  attr_reader :location, :x, :y, :count
+
+  def initialize(location)
+    @location = location
+    @x = location[0]
+    @y = location[1]
+    @count ||= 4
+  end
+
+end
+
+class MancalaStore
+  attr_reader :count
+
+  def initialize(location)
+    @count ||= 0
+  end
+
+end
+
 class MancalaBoardView
 
   attr_reader :app
@@ -24,18 +118,22 @@ class MancalaBoardView
   end
 
   def draw_pits
-    app.ellipse 285, 150, 150, 150
-    app.ellipse 285, 350, 150, 150
-    app.ellipse 455, 150, 150, 150
-    app.ellipse 455, 350, 150, 150
-    app.ellipse 625, 150, 150, 150
-    app.ellipse 625, 350, 150, 150
-    app.ellipse 795, 150, 150, 150
-    app.ellipse 795, 350, 150, 150
-    app.ellipse 965, 150, 150, 150
-    app.ellipse 965, 350, 150, 150
-    app.ellipse 1135, 150, 150, 150
-    app.ellipse 1135, 350, 150, 150
+    app.pit_controller.all.each do |pit|
+      app.ellipse pit.x, pit.y, 150, 150
+    end
+
+    # app.ellipse 285, 150, 150, 150
+    # app.ellipse 285, 350, 150, 150
+    # app.ellipse 455, 150, 150, 150
+    # app.ellipse 455, 350, 150, 150
+    # app.ellipse 625, 150, 150, 150
+    # app.ellipse 625, 350, 150, 150
+    # app.ellipse 795, 150, 150, 150
+    # app.ellipse 795, 350, 150, 150
+    # app.ellipse 965, 150, 150, 150
+    # app.ellipse 965, 350, 150, 150
+    # app.ellipse 1135, 150, 150, 150
+    # app.ellipse 1135, 350, 150, 150
   end
 
   def draw_stores
@@ -212,13 +310,16 @@ class MancalaKalahRules
 
 end
 
+
+
 class Mancala < Processing::App
 
-  attr_reader :board, :view, :model, :ruler
+  attr_reader :board, :view, :model, :pit_controller, :ruler
 
   def setup
     size 1425, 500
     background 0
+    @pit_controller = MancalaPitController.new(self)
     @board = MancalaBoardView.new(self)
     @view = MancalaGameView.new(self)
     @model = MancalaModel.new(self)
