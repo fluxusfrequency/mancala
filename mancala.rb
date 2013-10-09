@@ -63,6 +63,84 @@ class MancalaPitController
   def execute_take(pit)
     app.model.take_pit(pit)
     app.ruler.change_player
+    app.ruler.extra_turn = false
+  end
+
+  def recount_pits_starting_from(first_pit)
+    app.view.draw_no_beads(first_pit)
+    next_pit = find_next_pit(first_pit)
+    pits_to_fill = first_pit.count
+    @hit_a_store = false
+    for i in 1..pits_to_fill do
+      store_logic(i, pits_to_fill, next_pit)
+      add_bead_to_pit(next_pit)
+      app.view.draw_beads_in_pit(next_pit)
+      # FIX HERE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      # capture_from_empty(next_pit) if landed_on_empty_pit?(next_pit, i, pits_to_fill)
+      next_pit = find_next_pit(next_pit)
+    end
+    fix_beads_after_store_hit(next_pit) if @hit_a_store
+  end
+
+  def fix_beads_after_store_hit(next_pit)
+    last_pit = find_last_pit(next_pit)
+    remove_bead_from_pit(last_pit)
+    app.view.draw_beads_in_pit(next_pit)
+  end
+
+  def store_logic(i, pits_to_fill, next_pit)
+    if app.ruler.current_player.id == 1 && next_pit.id == 7
+      app.ruler.extra_turn = true if last_move?(i, pits_to_fill)
+      add_bead_to_store(player_1_store)
+      app.view.draw_beads_in_store(player_1_store)
+      @hit_a_store = true
+    elsif app.ruler.current_player.id == 2 && next_pit.id == 1
+      app.ruler.extra_turn = true if last_move?(i, pits_to_fill)
+      # puts "player: #{app.ruler.current_player.id}, iter:#{i}, next_pit: #{next_pit.id}, pits_to_fill: #{pits_to_fill}, extra_turn: #{app.ruler.extra_turn} \n*******"
+      add_bead_to_store(player_2_store)
+      app.view.draw_beads_in_store(player_2_store)
+      @hit_a_store = true
+    end
+  end
+
+  def landed_on_empty_pit?(pit, i, pits_to_fill)
+    last_move?(i, pits_to_fill) && pit.count = 0
+  end
+
+  def last_move?(i, pits_to_fill)
+    i == pits_to_fill
+  end
+
+  def capture_from_empty(pit)
+    opposite_pit_id = opposite_pit_id(pit)
+    opposite_pit = find_pit_by_id(opposite_pit_id)
+    beads_to_take = opposite_pit.count + 1
+    beads_to_take.times do
+      add_bead_to_store(current_players_store)
+    end
+    empty_pit(pit)
+    empty_pit(opposite_pit)
+  end
+
+  def opposite_pit_id(pit)
+    opposites = { 1 => 12,
+                  2 => 11,
+                  3 => 10,
+                  4 => 9,
+                  5 => 8,
+                  6 => 7,
+                  7 => 6,
+                  8 => 5,
+                  9 => 4,
+                  10 => 3,
+                  11 => 2,
+                  12 => 1 }
+    opposites[pit.id]
+  end
+
+  def current_players_store
+    return player_1_store if app.ruler.current_player.id == 1
+    return aplayer_2_store if app.ruler.current_player.id == 2
   end
 
   def valid_move?(pit)
@@ -96,6 +174,10 @@ class MancalaPitController
     else
       all.find {|pit| pit.id == first_pit.id - 1}
     end
+  end
+
+  def find_pit_by_id(id)
+    all.find {|pit| pit.id == id}
   end
 
   def all
@@ -277,32 +359,6 @@ class MancalaGameView
     when 6 then draw_six_beads(pit)
     else
       draw_many_beads(pit)
-    end
-  end
-
-  def redraw_pits_starting_from(first_pit)
-    draw_no_beads(first_pit)
-    next_pit = app.pit_controller.find_next_pit(first_pit)
-    pits_to_fill = first_pit.count
-    @hit_a_store = false
-    for i in 1..pits_to_fill do
-      if app.ruler.current_player.id == 1 && next_pit.id == 7
-        app.pit_controller.add_bead_to_store(app.pit_controller.player_1_store)
-        draw_bead_in_store(app.pit_controller.player_1_store)
-        @hit_a_store = true
-      elsif app.ruler.current_player.id == 2 && next_pit.id == 1
-        app.pit_controller.add_bead_to_store(app.pit_controller.player_2_store)
-        draw_bead_in_store(app.pit_controller.player_2_store)
-        @hit_a_store = true
-      end
-      app.pit_controller.add_bead_to_pit(next_pit)
-      draw_beads_in_pit(next_pit)
-      next_pit = app.pit_controller.find_next_pit(next_pit)
-    end
-    if @hit_a_store
-      last_pit = app.pit_controller.find_last_pit(next_pit)
-      app.pit_controller.remove_bead_from_pit(last_pit)
-      draw_beads_in_pit(next_pit)
     end
   end
 
@@ -511,7 +567,7 @@ class MancalaModel
   end
 
   def take_pit(pit)
-    app.view.redraw_pits_starting_from(pit)
+    app.pit_controller.recount_pits_starting_from(pit)
     pit_controller.empty_pit(pit)
   end
 
@@ -528,11 +584,12 @@ class MancalaKalahRules
   # Who won?
 
   attr_reader :app
-  attr_accessor :current_player, :game_over
+  attr_accessor :current_player, :game_over, :extra_turn
 
   def initialize(app)
     @app ||= app
     @game_over = false
+    @extra_turn = false
   end
 
   def create_player(n)
@@ -546,10 +603,11 @@ class MancalaKalahRules
 
   def change_player
     if @current_player == app.player_1
-      @current_player = app.player_2
-    else
-      @current_player = app.player_1
+      @current_player = app.player_2 unless extra_turn
+    elsif @current_player == app.player_2
+      @current_player = app.player_1 unless extra_turn
     end
+    extra_turn = false
   end
 
   def valid_pits_for_player(player)
@@ -563,7 +621,6 @@ class MancalaKalahRules
   def has_turn?(player)
     player == current_player
   end
-
 
 end
 
@@ -595,8 +652,8 @@ end
 
 class Mancala < Processing::App
 
-  attr_reader :board, :view, :model, :pit_controller, :ruler
-  attr_accessor :player_1, :player_2
+  attr_reader :board, :view, :model, :pit_controller
+  attr_accessor :player_1, :player_2, :ruler
 
   def setup
     size 1425, 500
