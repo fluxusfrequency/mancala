@@ -9,30 +9,42 @@ class MancalaBoardView
   end
 
   def draw_board
-    app.stroke 256
-    app.rect 50, 50, 800, 400
+    app.fill 106
+    app.stroke 0
+    app.rect 20, 55, 1385, 400
+    app.stroke 206
+    app.fill 256, 256, 256
+    app.rect 20, 50, 1385, 400
     draw_title
-    draw_circles
+
+    app.stroke 0
+    app.fill 225
+    draw_pits
+    draw_stores
   end
 
-  def draw_circles
-    app.stroke 0
-    app.ellipse 125, 150, 100, 125
-    app.ellipse 125, 350, 100, 125
-    app.ellipse 250, 150, 100, 125
-    app.ellipse 250, 350, 100, 125
-    app.ellipse 375, 150, 100, 125
-    app.ellipse 375, 350, 100, 125
-    app.ellipse 525, 150, 100, 125
-    app.ellipse 525, 350, 100, 125
-    app.ellipse 650, 150, 100, 125
-    app.ellipse 650, 350, 100, 125
-    app.ellipse 775, 150, 100, 125
-    app.ellipse 775, 350, 100, 125
+  def draw_pits
+    app.ellipse 285, 150, 150, 150
+    app.ellipse 285, 350, 150, 150
+    app.ellipse 455, 150, 150, 150
+    app.ellipse 455, 350, 150, 150
+    app.ellipse 625, 150, 150, 150
+    app.ellipse 625, 350, 150, 150
+    app.ellipse 795, 150, 150, 150
+    app.ellipse 795, 350, 150, 150
+    app.ellipse 965, 150, 150, 150
+    app.ellipse 965, 350, 150, 150
+    app.ellipse 1135, 150, 150, 150
+    app.ellipse 1135, 350, 150, 150
+  end
+
+  def draw_stores
+    app.ellipse 115, 250, 150, 350
+    app.ellipse 1305, 250, 150, 350
   end
 
   def draw_title
-    app.text "MANCALA", 415, 25
+    app.text "MANCALA", 628, 25
   end
 
 end
@@ -48,89 +60,124 @@ class MancalaGameView
   end
 
   def build_random_colors
-    10.times do
+    48.times do
       random_colors << [rand(256), rand(256), rand(256)]
     end
   end
 
-  def stroke_a_random_color(num)
+  def fill_a_random_color(num)
     puts "random_colors"
-    app.stroke(random_colors[num][0], random_colors[num][1], random_colors[num][2])
+    app.fill(random_colors[num][0], random_colors[num][1], random_colors[num][2])
   end
 
   def draw_game
-    stroke_a_random_color(0)
-    app.ellipse 100, 125, 25, 25
-    stroke_a_random_color(1)
-    app.ellipse 150, 125, 25, 25
-    stroke_a_random_color(2)
-    app.ellipse 100, 175, 25, 25
-    stroke_a_random_color(4)
-    app.ellipse 150, 175, 25, 25
+    fill_a_random_color(0)
+    app.ellipse 260, 125, 25, 25
+    fill_a_random_color(1)
+    app.ellipse 310, 125, 25, 25
+    fill_a_random_color(2)
+    app.ellipse 260, 175, 25, 25
+    fill_a_random_color(3)
+    app.ellipse 310, 175, 25, 25
 
-    stroke_a_random_color(5)
-    app.ellipse 225, 125, 25, 25
-    stroke_a_random_color(6)
-    app.ellipse 275, 125, 25, 25
-    stroke_a_random_color(7)
-    app.ellipse 225, 175, 25, 25
-    stroke_a_random_color(8)
-    app.ellipse 275, 175, 25, 25
+    fill_a_random_color(4)
+    app.ellipse 430, 125, 25, 25
+    fill_a_random_color(5)
+    app.ellipse 480, 125, 25, 25
+    fill_a_random_color(6)
+    app.ellipse 430, 175, 25, 25
+    fill_a_random_color(7)
+    app.ellipse 480, 175, 25, 25
 
-    stroke_a_random_color(9)
-    app.ellipse 350, 125, 25, 25
-    stroke_a_random_color(0)
-    app.ellipse 400, 125, 25, 25
-    stroke_a_random_color(1)
-    app.ellipse 350, 175, 25, 25
-    stroke_a_random_color(2)
-    app.ellipse 400, 175, 25, 25
+    fill_a_random_color(8)
+    app.ellipse 600, 125, 25, 25
+    fill_a_random_color(9)
+    app.ellipse 650, 125, 25, 25
+    fill_a_random_color(10)
+    app.ellipse 600, 175, 25, 25
+    fill_a_random_color(11)
+    app.ellipse 650, 175, 25, 25
 
-    app.ellipse 500, 125, 25, 25
-    app.ellipse 550, 125, 25, 25
-    app.ellipse 500, 175, 25, 25
-    app.ellipse 550, 175, 25, 25
+    fill_a_random_color(12)
+    app.ellipse 770, 125, 25, 25
+    fill_a_random_color(13)
+    app.ellipse 820, 125, 25, 25
+    fill_a_random_color(14)
+    app.ellipse 770, 175, 25, 25
+    fill_a_random_color(15)
+    app.ellipse 820, 175, 25, 25
 
-    app.ellipse 625, 125, 25, 25
-    app.ellipse 675, 125, 25, 25
-    app.ellipse 625, 175, 25, 25
-    app.ellipse 675, 175, 25, 25
+    fill_a_random_color(16)
+    app.ellipse 940, 125, 25, 25
+    fill_a_random_color(17)
+    app.ellipse 990, 125, 25, 25
+    fill_a_random_color(18)
+    app.ellipse 940, 175, 25, 25
+    fill_a_random_color(19)
+    app.ellipse 990, 175, 25, 25
 
-    app.ellipse 750, 125, 25, 25
-    app.ellipse 800, 125, 25, 25
-    app.ellipse 750, 175, 25, 25
-    app.ellipse 800, 175, 25, 25
+    fill_a_random_color(20)
+    app.ellipse 1110, 125, 25, 25
+    fill_a_random_color(21)
+    app.ellipse 1160, 125, 25, 25
+    fill_a_random_color(22)
+    app.ellipse 1110, 175, 25, 25
+    fill_a_random_color(23)
+    app.ellipse 1160, 175, 25, 25
 
-    app.ellipse 100, 325, 25, 25
-    app.ellipse 150, 325, 25, 25
-    app.ellipse 100, 375, 25, 25
-    app.ellipse 150, 375, 25, 25
+    fill_a_random_color(24)
+    app.ellipse 260, 325, 25, 25
+    fill_a_random_color(25)
+    app.ellipse 310, 325, 25, 25
+    fill_a_random_color(26)
+    app.ellipse 260, 375, 25, 25
+    fill_a_random_color(27)
+    app.ellipse 310, 375, 25, 25
 
-    app.ellipse 225, 325, 25, 25
-    app.ellipse 275, 325, 25, 25
-    app.ellipse 225, 375, 25, 25
-    app.ellipse 275, 375, 25, 25
+    fill_a_random_color(28)
+    app.ellipse 430, 325, 25, 25
+    fill_a_random_color(29)
+    app.ellipse 480, 325, 25, 25
+    fill_a_random_color(30)
+    app.ellipse 430, 375, 25, 25
+    fill_a_random_color(31)
+    app.ellipse 480, 375, 25, 25
 
-    app.ellipse 350, 325, 25, 25
-    app.ellipse 400, 325, 25, 25
-    app.ellipse 350, 375, 25, 25
-    app.ellipse 400, 375, 25, 25
+    fill_a_random_color(32)
+    app.ellipse 600, 325, 25, 25
+    fill_a_random_color(33)
+    app.ellipse 650, 325, 25, 25
+    fill_a_random_color(34)
+    app.ellipse 600, 375, 25, 25
+    fill_a_random_color(35)
+    app.ellipse 650, 375, 25, 25
 
-    app.ellipse 500, 325, 25, 25
-    app.ellipse 550, 325, 25, 25
-    app.ellipse 500, 375, 25, 25
-    app.ellipse 550, 375, 25, 25
+    fill_a_random_color(36)
+    app.ellipse 770, 325, 25, 25
+    fill_a_random_color(37)
+    app.ellipse 820, 325, 25, 25
+    fill_a_random_color(38)
+    app.ellipse 770, 375, 25, 25
+    fill_a_random_color(39)
+    app.ellipse 820, 375, 25, 25
 
-    app.ellipse 625, 325, 25, 25
-    app.ellipse 675, 325, 25, 25
-    app.ellipse 625, 375, 25, 25
-    app.ellipse 675, 375, 25, 25
+    fill_a_random_color(40)
+    app.ellipse 940, 325, 25, 25
+    fill_a_random_color(41)
+    app.ellipse 990, 325, 25, 25
+    fill_a_random_color(42)
+    app.ellipse 940, 375, 25, 25
+    fill_a_random_color(43)
+    app.ellipse 990, 375, 25, 25
 
-    app.ellipse 750, 325, 25, 25
-    app.ellipse 800, 325, 25, 25
-    app.ellipse 750, 375, 25, 25
-    app.ellipse 800, 375, 25, 25
-
+    fill_a_random_color(44)
+    app.ellipse 1110, 325, 25, 25
+    fill_a_random_color(45)
+    app.ellipse 1160, 325, 25, 25
+    fill_a_random_color(46)
+    app.ellipse 1110, 375, 25, 25
+    fill_a_random_color(47)
+    app.ellipse 1160, 375, 25, 25
   end
 
 end
@@ -146,7 +193,7 @@ class MancalaModel
 
 end
 
-class MancalaRuler
+class MancalaKalahRules
   attr_reader :app
 
   def initialize(app)
@@ -170,11 +217,12 @@ class Mancala < Processing::App
   attr_reader :board, :view, :model, :ruler
 
   def setup
-    size 900, 500
+    size 1425, 500
+    background 0
     @board = MancalaBoardView.new(self)
     @view = MancalaGameView.new(self)
     @model = MancalaModel.new(self)
-    @ruler = MancalaRuler.new(self)
+    @ruler = MancalaKalahRules.new(self)
   end
 
   def draw
