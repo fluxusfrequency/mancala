@@ -173,6 +173,18 @@ class MancalaPitController
     all.find {|pit| pit.id == id}
   end
 
+  def clear_remaining_beads
+    pits_with_beads_left.each do |pit|
+      beads_to_take = pit.count
+      current_players_store.count += beads_to_take
+      empty_pit(pit)
+    end
+  end
+
+  def pits_with_beads_left
+    all.collect {|pit| pit.count > 0}
+  end
+
   def all
     @all ||= [pit1,
               pit2,
@@ -254,6 +266,10 @@ class MancalaStore
 
   def empty?
     count == 0
+  end
+
+  def all_empty_pits
+    all.select {|pit| pit.empty?}
   end
 
   def player
@@ -514,6 +530,19 @@ class MancalaGameView
     app.text "Player two, your move!", 640, 475 if app.ruler.current_player.id == 2
   end
 
+  def print_winner(winner)
+    app.background 0,0,0
+    app.textSize(56)
+    app.text "Player one is the winner!", 640, 475 if winner.id == 1
+    app.text "Player two is the winner!", 640, 475 if winner.id == 2
+  end
+
+  def print_tie
+    app.background 0,0,0
+    app.textSize(56)
+    app.text "Tie Game!", 640, 475 if app.ruler.current_player.id == 1
+  end
+
 end
 
 class MancalaModel
@@ -576,7 +605,7 @@ class MancalaKalahRules
   # Where do leftover beads go if the game is over?
   # Who won?
 
-  attr_reader :app
+  attr_reader :app, :all_players
   attr_accessor :current_player, :game_over, :extra_turn
 
   def initialize(app)
@@ -613,6 +642,47 @@ class MancalaKalahRules
 
   def has_turn?(player)
     player == current_player
+  end
+
+  def all_players
+    @all_players ||= [app.player_1, app.player_2]
+  end
+
+  def all_empty_on_one_side?
+    app.pit_controller.all_empty_pits.include?{[1,2,3,4,5,6] || [7,8,9,10,11,12]}
+  end
+
+  def compare_scores
+    if app.pit_controller.player_1_store.count > app.pit_controller.player_1_store.count
+      return :player_1_win
+    elsif app.pit_controller.player_1_store.count < app.pit_controller.player_1_store.count
+      return :player_2_win
+    elsif app.pit_controller.player_1_store.count = app.pit_controller.player_1_store.count
+      return :tie
+    else
+      return
+    end
+  end
+
+  def declare_winner
+    if compare_scores == :player_1_win
+      @winner = app.player_1
+    elsif compare_scores == :player_2_win
+      @winner = app.player_1
+    elsif compare_scores == :tie
+      # app.view.print_tie
+      return
+    else
+      return
+    end
+    app.view.print_winner(@winner)
+  end
+
+  def check_and_execute_game_over
+    return unless all_empty_on_one_side?
+    game_over = true
+    app.pit_controller.clear_remaining_beads
+
   end
 
 end
@@ -671,12 +741,8 @@ class Mancala < Processing::App
   def mouse_pressed
     position = [mouse_x, mouse_y]
     pit_controller.take_pit_if_available(position)
-    # check_for_win
+    ruler.check_and_execute_game_over
   end
-
-  # def players
-  #   [player_1, player_2]
-  # end
 
 end
 
