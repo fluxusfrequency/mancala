@@ -1,5 +1,5 @@
 require 'ruby-processing'
-require './lib/mancala.rb'
+
 Dir['./lib/mancala/*.rb'].each do |file|
   require file
 end
@@ -20,14 +20,14 @@ class Mancala < Processing::App
   end
 
   def draw
-    # view.invite_move
-    # board.draw_board
-    # view.draw_all_beads
+    view.invite_move
+    board.draw_board
+    view.draw_all_beads
   end
 
   def mouse_pressed
-    # position = [mouse_x, mouse_y]
-    # controller.take_pit_if_available(position)
+    position = [mouse_x, mouse_y]
+    controller.take_pit_if_available(position)
     # ruler.check_and_execute_game_over
   end
 
