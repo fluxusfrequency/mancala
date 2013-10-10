@@ -52,6 +52,10 @@ class MancalaPitController
     pit.count = 0
   end
 
+  def all_empty_pits
+    all.select {|pit| pit.empty?}
+  end
+
   def take_pit_if_available(coordinates)
     return if coordinates[0] == 0 || coordinates[1] == 0
     found_pit = find_pit_by_coordinates(coordinates)
@@ -91,12 +95,12 @@ class MancalaPitController
 
   def store_logic(i, pits_to_fill, next_pit)
     if app.ruler.current_player.id == 1 && next_pit.id == 7
-      app.ruler.extra_turn = true if last_move?(i, pits_to_fill)
+      app.ruler.extra_turn = true if i == pits_to_fill
       add_bead_to_store(player_1_store)
       app.view.draw_beads_in_store(player_1_store)
       @hit_a_store = true
     elsif app.ruler.current_player.id == 2 && next_pit.id == 1
-      app.ruler.extra_turn = true if last_move?(i, pits_to_fill)
+      app.ruler.extra_turn = true if i == pits_to_fill
       # puts "player: #{app.ruler.current_player.id}, iter:#{i}, next_pit: #{next_pit.id}, pits_to_fill: #{pits_to_fill}, extra_turn: #{app.ruler.extra_turn} \n*******"
       add_bead_to_store(player_2_store)
       app.view.draw_beads_in_store(player_2_store)
@@ -266,10 +270,6 @@ class MancalaStore
 
   def empty?
     count == 0
-  end
-
-  def all_empty_pits
-    all.select {|pit| pit.empty?}
   end
 
   def player
@@ -649,7 +649,20 @@ class MancalaKalahRules
   end
 
   def all_empty_on_one_side?
-    app.pit_controller.all_empty_pits.include?{[1,2,3,4,5,6] || [7,8,9,10,11,12]}
+    app.pit_controller.all_empty_pits.all? do |pit|
+      player_1_side_pits.include?(pit.id)
+    end
+    app.pit_controller.all_empty_pits.all? do |pit|
+      player_2_side_pits.include?(pit.id)
+    end
+  end
+
+  def player_1_side_pits
+    @player_1_side_pits ||= [1,2,3,4,5,6]
+  end
+
+  def player_2_side_pits
+    @player_2_side_pits ||= [7,8,9,10,11,12]
   end
 
   def compare_scores
@@ -679,10 +692,11 @@ class MancalaKalahRules
   end
 
   def check_and_execute_game_over
-    return unless all_empty_on_one_side?
+    if !all_empty_on_one_side?
+      return
+    end
     game_over = true
     app.pit_controller.clear_remaining_beads
-
   end
 
 end
@@ -741,7 +755,7 @@ class Mancala < Processing::App
   def mouse_pressed
     position = [mouse_x, mouse_y]
     pit_controller.take_pit_if_available(position)
-    ruler.check_and_execute_game_over
+    # ruler.check_and_execute_game_over
   end
 
 end
