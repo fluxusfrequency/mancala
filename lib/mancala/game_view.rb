@@ -1,5 +1,7 @@
 class MancalaGameView
 
+  # Four pieces -- marbles or stones -- are placed in each of the 12 holes. The color of the pieces is irrelevant.
+
   # What do the beads look like?
   # How do I render a pit with
   # 0,1,2,3,4,5,6,7,8 or more beads?

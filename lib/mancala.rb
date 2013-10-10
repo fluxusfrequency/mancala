@@ -1,8 +1,8 @@
 require 'ruby-processing'
 
-Dir['./lib/mancala/*.rb'].each do |file|
-  require file
-end
+# Dir['./mancala/*.rb'].each do |file|
+#   require file
+# end
 
 class Mancala < Processing::App
 

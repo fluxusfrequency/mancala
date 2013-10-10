@@ -1,56 +1,7 @@
 class MancalaController
 
-  # Which pits are in this game?
-  # Which stores are in this game?
-
-  attr_reader :app
-  attr_accessor :pit1,
-                :pit2,
-                :pit3,
-                :pit4,
-                :pit5,
-                :pit6,
-                :pit7,
-                :pit8,
-                :pit9,
-                :pit10,
-                :pit11,
-                :pit12,
-                :player_1_store,
-                :player_2_store
-
   def initialize(app)
     @app = app
-    setup_pits
-    setup_stores
-  end
-
-  def location_of_pit(pit)
-    [pit.x, pit.y]
-  end
-
-  def return_count_of_pit(pit)
-    pit.count
-  end
-
-  def add_bead_to_pit(pit)
-    pit.count += 1
-  end
-
-  def remove_bead_from_pit(pit)
-    pit.count -= 1
-  end
-
-  def add_bead_to_store(store)
-    store.count += 1
-  end
-
-  def empty_pit(pit)
-    pit.count = 0
-  end
-
-  def all_empty_pits
-    all.select {|pit| pit.empty?}
   end
 
   def take_pit_if_available(coordinates)

@@ -8,16 +8,12 @@ class MancalaStore
   attr_accessor :count
 
   def initialize(id)
-    @count ||= 0
     @id = id
+    @count ||= 0
   end
 
   def empty?
     count == 0
-  end
-
-  def player
-    app.players.select{|player| player.id == player_id}
   end
 
 end
