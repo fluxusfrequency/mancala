@@ -74,9 +74,11 @@ class MancalaPitController
     for i in 1..pits_to_fill do
       store_logic(i, pits_to_fill, next_pit)
       add_bead_to_pit(next_pit)
-      app.view.draw_beads_in_pit(next_pit)
-      # FIX HERE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-      # capture_from_empty(next_pit) if landed_on_empty_pit?(next_pit, i, pits_to_fill)
+      puts "player: #{app.ruler.current_player.id}, iter:#{i}, next_pit: #{next_pit.id}, pits_to_fill: #{pits_to_fill}, pit count: #{next_pit.count} \n*******"
+      if i == pits_to_fill && app.ruler.current_player.my_pit_ids.include?(next_pit.id) && next_pit.count == 1
+        puts "landed on an empty pit"
+        capture_from_empty(next_pit)
+      end
       next_pit = find_next_pit(next_pit)
     end
     fix_beads_after_store_hit(next_pit) if @hit_a_store
@@ -85,7 +87,6 @@ class MancalaPitController
   def fix_beads_after_store_hit(next_pit)
     last_pit = find_last_pit(next_pit)
     remove_bead_from_pit(last_pit)
-    app.view.draw_beads_in_pit(next_pit)
   end
 
   def store_logic(i, pits_to_fill, next_pit)
@@ -101,14 +102,6 @@ class MancalaPitController
       app.view.draw_beads_in_store(player_2_store)
       @hit_a_store = true
     end
-  end
-
-  def landed_on_empty_pit?(pit, i, pits_to_fill)
-    last_move?(i, pits_to_fill) && pit.count = 0
-  end
-
-  def last_move?(i, pits_to_fill)
-    i == pits_to_fill
   end
 
   def capture_from_empty(pit)
@@ -140,7 +133,7 @@ class MancalaPitController
 
   def current_players_store
     return player_1_store if app.ruler.current_player.id == 1
-    return aplayer_2_store if app.ruler.current_player.id == 2
+    return player_2_store if app.ruler.current_player.id == 2
   end
 
   def valid_move?(pit)
@@ -638,9 +631,11 @@ class MancalaPlayer
 
   def my_pit_ids
     if id == 1
-      [1, 2, 3, 4]
+      return [1, 2, 3, 4, 5, 6]
+    elsif id == 2
+      return [7, 8, 9, 10, 11, 12]
     else
-      [5, 6, 7, 8]
+      return []
     end
   end
 
