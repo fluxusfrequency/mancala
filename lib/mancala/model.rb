@@ -48,6 +48,12 @@ class MancalaModel
                     pit9, pit10, pit11, pit12 ]
   end
 
+  def opposites
+    { 1 => 12, 2 => 11, 3 => 10, 4 => 9, 5 => 8,
+      6 => 7, 7 => 6, 8 => 5, 9 => 4, 10 => 3,
+      11 => 2, 12 => 1 }
+  end
+
   def all_stores
     @all_stores ||= [store1, store2]
   end
@@ -70,6 +76,10 @@ class MancalaModel
 
   def find_all_pits_by_count(count)
     pit_counts[count]
+  end
+
+  def find_pit_count_by_id(id)
+    find_pit_by_id(id).count
   end
 
   def pit_counts
@@ -96,39 +106,33 @@ class MancalaModel
     find_pit_by_id(id).count = 0
   end
 
+  def find_opposite_pit_by_id(id)
+    find_pit_by_id(opposites[id])
+  end
 
+  def all_empty_on_one_side?
+    empty_on_player_1_side? || empty_on_player_2_side?
+  end
 
+  def empty_pit_ids
+    find_all_pits_by_count(0).collect(&:id)
+  end
 
+  def empty_on_player_1_side?
+    player_1_side_pit_ids.all?{|pit| empty_pit_ids.include?(pit)}
+  end
 
-  # def available_pits
-  #   all_pits - empty_pits
-  # end
+  def empty_on_player_2_side?
+    player_2_side_pit_ids.all?{|pit| empty_pit_ids.include?(pit)}
+  end
 
-  # def empty_pits
-  #   controller.empty_pits
-  # end
+  def player_1_side_pit_ids
+    [1, 2, 3, 4, 5, 6]
+  end
 
-  # def current_players_store_count
-  #   store_count_of(app.ruler.current_player)
-  # end
+  def player_2_side_pit_ids
+    [7, 8, 9, 10, 11, 12]
+  end
 
-  # def opponents_store_count
-  #   if app.ruler.current_player == app.ruler.player_1
-  #     opponent = app.ruler.player_2
-  #   else
-  #     opponent = app.ruler.player_1
-  #   end
-  #     store_count_of(opponent)
-  # end
-
-  # def take_pit(pit)
-  #   app.controller.recount_pits_starting_from(pit)
-  #   controller.empty_pit(pit)
-  # end
-
-  # def store_count_of(player)
-  #   store1 if player.id == 1
-  #   player_2_store if player.id == 2
-  # end
 
 end

@@ -67,22 +67,6 @@ class MancalaController
     empty_pit(opposite_pit)
   end
 
-  def opposite_pit_id(pit)
-    opposites = { 1 => 12,
-                  2 => 11,
-                  3 => 10,
-                  4 => 9,
-                  5 => 8,
-                  6 => 7,
-                  7 => 6,
-                  8 => 5,
-                  9 => 4,
-                  10 => 3,
-                  11 => 2,
-                  12 => 1 }
-    opposites[pit.id]
-  end
-
   def current_players_store
     return player_1_store if app.ruler.current_player.id == 1
     return player_2_store if app.ruler.current_player.id == 2

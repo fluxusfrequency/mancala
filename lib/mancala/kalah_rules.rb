@@ -18,10 +18,11 @@ class MancalaKalahRules
   # Who won?
 
   attr_reader :app, :player_1, :player_2
-  attr_accessor :current_player
+  attr_accessor :current_player, :extra_turn
 
   def initialize(app)
     @app ||= app
+    @extra_turn = false
     setup_players
   end
 
@@ -36,20 +37,13 @@ class MancalaKalahRules
 
   def change_player
     if @current_player == player_1
-      @current_player = player_2 # unless extra_turn
+      @current_player = player_2 unless @extra_turn
     elsif @current_player == player_2
-      @current_player = player_1 # unless extra_turn
+      @current_player = player_1 unless @extra_turn
     end
-    # extra_turn = false
+    @extra_turn = false
   end
 
-  def player_1_side_pit_ids
-    [1, 2, 3, 4, 5, 6]
-  end
-
-  def player_2_side_pit_ids
-    [7, 8, 9, 10, 11, 12]
-  end
 
   def legal_pit?(pit_id, player)
     if app.model.find_pit_by_id(pit_id).empty?
@@ -57,9 +51,9 @@ class MancalaKalahRules
     end
 
     if player.id == 1
-      player_1_side_pit_ids.include?(pit_id)
+      app.model.player_1_side_pit_ids.include?(pit_id)
     elsif player.id == 2
-      player_2_side_pit_ids.include?(pit_id)
+      app.model.player_2_side_pit_ids.include?(pit_id)
     end
   end
 
@@ -71,78 +65,88 @@ class MancalaKalahRules
   def distribute_beads_for_player(player, first_pit_id, count)
     next_pit_id = app.model.find_next_pit_by_id(first_pit_id)
 
-    i = 0
-    while i < count do
-      if next_pit_id == 7 && player.id == 1
-        distribute_into_store(1)
-        i += 1
-        return if i == count
-      elsif next_pit_id == 1 && player.id == 2
-        distribute_into_store(2)
-        i += 1
-        return if i == count
-      end
+    @i = 0
+    while @i < count do
+      execute_store_logic(next_pit_id, player, count)
+      break if @i == count
       app.model.add_bead_to_pit(next_pit_id)
       next_pit_id = app.model.find_next_pit_by_id(next_pit_id)
-      i += 1
+      if @i == count - 1
+        take_both_sides(next_pit_id-1) if landed_on_empty?(next_pit_id-1)
+      end
+      @i += 1
     end
+  end
 
+  def execute_store_logic(next_pit_id, player, count)
+    if going_into_players_store?(next_pit_id, player)
+      distribute_into_store(player.id)
+      @i += 1
+      extra_turn_if_landed_on_store(count)
+    end
+  end
+
+  def going_into_players_store?(next_pit_id, player)
+    next_pit_id == 7 && player.id == 1 || next_pit_id == 1 && player.id == 2
+  end
+
+  def extra_turn_if_landed_on_store(count)
+    if @i == count
+      @extra_turn = true
+    end
   end
 
   def distribute_into_store(store_id)
     app.model.add_bead_to_store(store_id)
   end
 
-  # def recount_pits_starting_from(first_pit)
-  #   app.view.draw_no_beads(first_pit)
-  #   next_pit = find_next_pit(first_pit)
-  #   pits_to_fill = first_pit.count
-  #   @hit_a_store = false
-  #   for i in 1..pits_to_fill do
-  #     store_logic(i, pits_to_fill, next_pit)
-  #     add_bead_to_pit(next_pit)
-  #     puts "player: #{app.ruler.current_player.id}, iter:#{i}, next_pit: #{next_pit.id}, pits_to_fill: #{pits_to_fill}, pit count: #{next_pit.count} \n*******"
-  #     if i == pits_to_fill && app.ruler.current_player.my_pit_ids.include?(next_pit.id) && next_pit.count == 1
-  #       puts "landed on an empty pit"
-  #       capture_from_empty(next_pit)
-  #     end
-  #     next_pit = find_next_pit(next_pit)
-  #   end
-  #   fix_beads_after_store_hit(next_pit) if @hit_a_store
-  # end
-
-  def player_1_distribution_targets
-    @player_1_distribution_targets ||= [
-    app.model.pit1, app.model.pit2,
-    app.model.pit3, app.model.pit4,
-    app.model.pit5, app.model.pit6,
-    app.model.store1, app.model.pit7,
-    app.model.pit8, app.model.pit9,
-    app.model.pit10, app.model.pit11,
-    app.model.pit12 ]
+  def take_both_sides(pit_id)
+    take_this_side(pit_id)
+    take_that_side(pit_id)
   end
 
-  def player_2_distribution_targets
-    @player_2_distribution_targets ||= [
-    app.model.pit1, app.model.pit2,
-    app.model.pit3, app.model.pit4,
-    app.model.pit5, app.model.pit6,
-    app.model.pit7, app.model.pit8,
-    app.model.pit9, app.model.pit10,
-    app.model.pit11, app.model.pit12,
-    app.model.store2 ]
+  def take_this_side(pit_id)
+    current_players_store.count += 1
+    app.model.empty_pit(pit_id)
   end
 
+  def take_that_side(pit_id)
+    current_players_store.count += opposing_pit(pit_id).count
+    app.model.empty_pit(opposing_pit(pit_id).id)
+  end
 
+  def opposing_pit(pit_id)
+    app.model.find_opposite_pit_by_id(pit_id)
+  end
 
-  # def all_empty_on_one_side?
-  #   app.controller.all_empty_pits.all? do |pit|
-  #     player_1_side_pits.include?(pit.id)
-  #   end
-  #   app.controller.all_empty_pits.all? do |pit|
-  #     player_2_side_pits.include?(pit.id)
-  #   end
-  # end
+  def current_players_store
+    app.model.find_store_by_id(current_player.id)
+  end
+
+  def landed_on_empty?(pit_id)
+    app.model.find_pit_by_id(pit_id).count == 1
+  end
+
+  def game_over?
+    app.model.all_empty_on_one_side?
+  end
+
+  def execute_end_game
+    take_remaining_beads_on_game_over
+  end
+
+  def take_remaining_beads_on_game_over
+    if app.model.empty_on_player_1_side?
+      take_remaining_beads_from_side_2
+    elsif
+  end
+
+  def take_remaining_beads_from_side_1
+
+  end
+
+  def take_remaining_beads_from_side_2
+  end
 
   # def compare_scores
   #   if app.controller.player_1_store.count > app.controller.player_1_store.count

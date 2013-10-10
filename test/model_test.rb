@@ -82,4 +82,32 @@ class ModelTest < Minitest::Test
     assert_equal 1, model.find_next_pit_by_id(12)
   end
 
+  def test_it_can_return_the_opposite_pit
+    assert_equal 11, model.find_opposite_pit_by_id(2).id
+  end
+
+  def test_it_can_tell_if_player_one_side_is_empty
+    model.empty_pit(1)
+    model.empty_pit(2)
+    model.empty_pit(3)
+    model.empty_pit(4)
+    model.empty_pit(5)
+    model.empty_pit(6)
+    assert model.all_empty_on_one_side?
+    model.find_pit_by_id(1).count = 1
+    refute model.all_empty_on_one_side?
+  end
+
+  def test_it_can_tell_if_player_one_side_is_empty
+    model.empty_pit(7)
+    model.empty_pit(8)
+    model.empty_pit(9)
+    model.empty_pit(10)
+    model.empty_pit(11)
+    model.empty_pit(12)
+    assert model.all_empty_on_one_side?
+    model.find_pit_by_id(8).count = 1
+    refute model.all_empty_on_one_side?
+  end
+
 end
