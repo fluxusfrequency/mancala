@@ -65,37 +65,28 @@ class MancalaKalahRules
 
   def distribute_beads_from(pit_id, player)
     count = app.model.find_pit_by_id(pit_id).count
-    if player.id == 1
-      distribute_beads_for_player_1(pit_id, count)
-    elsif player.id == 2
-      distribute_beads_for_player_2(pit_id, count)
-    end
+    distribute_beads_for_player(player, pit_id, count)
   end
 
-  def distribute_beads_for_player_1(first_pit_id, count)
+  def distribute_beads_for_player(player, first_pit_id, count)
     next_pit_id = app.model.find_next_pit_by_id(first_pit_id)
 
-    for i in 1..count do
-      if next_pit_id == 7
+    i = 0
+    while i < count do
+      if next_pit_id == 7 && player.id == 1
         distribute_into_store(1)
-      else
-        app.model.add_bead_to_pit(next_pit_id)
-        next_pit_id = app.model.find_next_pit_by_id(next_pit_id)
-      end
-    end
-  end
-
-  def distribute_beads_for_player_2(first_pit_id, count)
-    next_pit_id = app.model.find_next_pit_by_id(first_pit_id)
-
-    for i in 1..count do
-      if next_pit_id == 1
+        i += 1
+        return if i == count
+      elsif next_pit_id == 1 && player.id == 2
         distribute_into_store(2)
-      else
-        app.model.add_bead_to_pit(next_pit_id)
-        next_pit_id = app.model.find_next_pit_by_id(next_pit_id)
+        i += 1
+        return if i == count
       end
+      app.model.add_bead_to_pit(next_pit_id)
+      next_pit_id = app.model.find_next_pit_by_id(next_pit_id)
+      i += 1
     end
+
   end
 
   def distribute_into_store(store_id)

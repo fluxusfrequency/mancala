@@ -89,11 +89,12 @@ class RulerTest < Minitest::Test
   end
 
   def test_distributes_beads_into_player_one_store
-    ruler.distribute_beads_from(3, ruler.player_1)
+    ruler.distribute_beads_from(4, ruler.player_1)
     assert_equal 3, model.pit_counts[5].count
-    assert_equal 5, model.find_pit_by_id(4).count
     assert_equal 5, model.find_pit_by_id(5).count
     assert_equal 5, model.find_pit_by_id(6).count
+    assert_equal 5, model.find_pit_by_id(7).count
+    assert_equal 4, model.find_pit_by_id(8).count
     assert_equal 1, model.find_store_by_id(1).count
   end
 
@@ -103,6 +104,7 @@ class RulerTest < Minitest::Test
     assert_equal 5, model.find_pit_by_id(10).count
     assert_equal 5, model.find_pit_by_id(11).count
     assert_equal 5, model.find_pit_by_id(12).count
+    assert_equal 4, model.find_pit_by_id(1).count
     assert_equal 1, model.find_store_by_id(2).count
   end
 
