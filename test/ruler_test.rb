@@ -140,10 +140,26 @@ class RulerTest < Minitest::Test
     assert ruler.game_over?
   end
 
-  # def test_it_gives_remaining_beads_to_player_on_game_over
-  #   ruler.execute_end_game
-  # end
+  def test_it_gives_remaining_beads_to_player_on_game_over
+    model.empty_pit(1)
+    model.empty_pit(2)
+    model.empty_pit(3)
+    model.empty_pit(4)
+    model.empty_pit(5)
+    model.empty_pit(6)
+    ruler.execute_end_game
+    assert_equal 24, model.find_store_count_by_id(2)
+  end
 
+  def test_it_can_compare_the_players_scores
+    model.empty_pit(1)
+    model.empty_pit(2)
+    model.empty_pit(3)
+    model.empty_pit(4)
+    model.empty_pit(5)
+    model.empty_pit(6)
+    ruler.execute_end_game
+    assert_equal ruler.player_2, ruler.winner
   end
 
 

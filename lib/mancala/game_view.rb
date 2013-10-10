@@ -213,12 +213,7 @@ class MancalaGameView
     app.textSize(56)
     app.text "Player one is the winner!", 640, 475 if winner.id == 1
     app.text "Player two is the winner!", 640, 475 if winner.id == 2
-  end
-
-  def print_tie
-    app.background 0,0,0
-    app.textSize(56)
-    app.text "Tie Game!", 640, 475 if app.ruler.current_player.id == 1
+    app.text "Tie Game!", 640, 475 if winner == :id
   end
 
 end

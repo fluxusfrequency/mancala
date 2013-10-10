@@ -82,6 +82,10 @@ class MancalaModel
     find_pit_by_id(id).count
   end
 
+  def find_store_count_by_id(id)
+    find_store_by_id(id).count
+  end
+
   def pit_counts
     all_pits.group_by(&:count)
   end
@@ -132,6 +136,26 @@ class MancalaModel
 
   def player_2_side_pit_ids
     [7, 8, 9, 10, 11, 12]
+  end
+
+  def player_1_side_pits
+    player_1_side_pit_ids.collect do |id|
+      find_pit_by_id(id)
+    end
+  end
+
+  def player_2_side_pits
+    player_2_side_pit_ids.collect do |id|
+      find_pit_by_id(id)
+    end
+  end
+
+  def find_all_pits_on_players_side(player)
+    if player.id == 1
+      player_1_side_pits
+    elsif player.id == 2
+      player_2_side_pits
+    end
   end
 
 

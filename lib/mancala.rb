@@ -1,8 +1,8 @@
 require 'ruby-processing'
 
-# Dir['./mancala/*.rb'].each do |file|
-#   require file
-# end
+Dir['./mancala/*.rb'].each do |file|
+  require file
+end
 
 class Mancala < Processing::App
 
@@ -12,7 +12,6 @@ class Mancala < Processing::App
   def setup
     size 1425, 500
     background 0
-    @controller = MancalaController.new(self)
     @board = MancalaBoardView.new(self)
     @view = MancalaGameView.new(self)
     @model = MancalaModel.new(self)

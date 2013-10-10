@@ -110,4 +110,12 @@ class ModelTest < Minitest::Test
     refute model.all_empty_on_one_side?
   end
 
+  def test_it_returns_pits_for_each_side
+    assert_equal 6, model.player_1_side_pits.count
+    assert_kind_of MancalaPit, model.player_1_side_pits.first
+    assert_equal 6, model.player_2_side_pits.count
+    assert_kind_of MancalaPit, model.player_2_side_pits.first
+  end
+
+
 end

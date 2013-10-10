@@ -1,24 +1,7 @@
 class MancalaKalahRules
 
-  # The game begins with one player picking up all of the pieces in any one of the holes on his side.
-  # Moving counter-clockwise, the player deposits one of the stones in each hole until the stones run out.
-  # If you run into your own store, deposit one piece in it. If you run into your opponent's store, skip it.
-  # If the last piece you drop is in your own store, you get a free turn.
-  # If the last piece you drop is in an empty hole on your side, you capture that piece and any pieces in the hole directly opposite.
-  # The game ends when all six spaces on one side of the Mancala board are empty.
-  # The player who still has pieces on his side of the board when the game ends captures all of those pieces.
-  # Count all the pieces in each store. The winner is the player with the most pieces.
-
-  # Which direction do moves go?
-  # Which pits are legal moves?
-  # Where do the beads go when a player selects a pit?
-  # What happens if I land on a given pit?
-  # Is the game over?
-  # Where do leftover beads go if the game is over?
-  # Who won?
-
   attr_reader :app, :player_1, :player_2
-  attr_accessor :current_player, :extra_turn
+  attr_accessor :current_player, :extra_turn, :winner
 
   def initialize(app)
     @app ||= app
@@ -133,19 +116,49 @@ class MancalaKalahRules
 
   def execute_end_game
     take_remaining_beads_on_game_over
+    declare_winner
   end
 
   def take_remaining_beads_on_game_over
     if app.model.empty_on_player_1_side?
-      take_remaining_beads_from_side_2
-    elsif
+      take_remaining_beads_from_players_side(player_2)
+    elsif app.model.empty_on_player_2_side?
+      take_remaining_beads_from_players_side(player_1)
+    end
   end
 
-  def take_remaining_beads_from_side_1
-
+  def take_remaining_beads_from_players_side(player)
+    app.model.find_all_pits_on_players_side(player).each do |pit|
+      players_store(player).count += pit.count
+      pit.count = 0
+    end
   end
 
-  def take_remaining_beads_from_side_2
+  def players_store(player)
+    app.model.find_store_by_id(player.id)
+  end
+
+  def player_1_won?
+    score_for_player(player_1) > score_for_player(player_2)
+  end
+
+  def player_2_won?
+    score_for_player(player_1) < score_for_player(player_2)
+  end
+
+  def tie?
+    score_for_player(player_1) == score_for_player(player_2)
+  end
+
+  def declare_winner
+    @winner = player_1 if player_1_won?
+    @winner = player_2 if player_2_won?
+    @winner = :tie if tie?
+    return
+  end
+
+  def score_for_player(player)
+    app.model.find_store_count_by_id(player.id)
   end
 
   # def compare_scores
