@@ -129,6 +129,13 @@ class RulerTest < Minitest::Test
     assert_equal 5, ruler.current_players_store.count
   end
 
+  def test_it_takes_the_last_bead_and_opponents_beads_when_landing_on_an_empty_pit_on_the_players_side
+    model.find_pit_by_id(12).count = 0
+    ruler.distribute_beads_from(8, ruler.player_2)
+    assert_equal 0, model.find_pit_count_by_id(1)
+    assert_equal 5, ruler.current_players_store.count
+  end
+
   def test_it_knows_when_the_game_ends
     model.empty_pit(1)
     model.empty_pit(2)

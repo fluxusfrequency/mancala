@@ -100,10 +100,7 @@ class MancalaKalahRules
 
   def take_that_side(pit_id)
     current_players_store.count += opposing_pit(pit_id).count
-    puts opposing_pit(pit_id).id
-    puts "before: #{app.model.find_pit_count_by_id(opposing_pit(pit_id).id)}"
     app.model.empty_pit(opposing_pit(pit_id).id)
-    puts "after: #{app.model.find_pit_count_by_id(opposing_pit(pit_id).id)}"
   end
 
   def opposing_pit(pit_id)
