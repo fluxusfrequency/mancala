@@ -1,15 +1,5 @@
 class MancalaModel
 
-  # If you run into your own store, deposit one piece in it.
-  # If the last piece you drop is in an empty hole on your side, you capture that piece and any pieces in the hole directly opposite.
-  # Always place all captured pieces in your store.
-  # The player who still has pieces on his side of the board when the game ends captures all of those pieces.
-
-  # What are all the pit and store objects in the game?
-  # Find a pit or store by its id.
-  # Find all the empty pits.
-  # How many pieces are in each store and pit?
-
   attr_reader :app, :controller, :all_stores
   attr_accessor :all_pits, :store1, :store2, :current_count,
                 :pit1, :pit2, :pit3, :pit4, :pit5, :pit6,

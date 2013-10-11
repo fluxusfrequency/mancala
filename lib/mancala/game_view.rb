@@ -5,16 +5,8 @@ class MancalaGameView
 
   def initialize(app)
     @app ||= app
-    @random_colors ||= []
-    build_random_colors
-    @xfix = -13
-    @yfix = -7
-  end
-
-  def build_random_colors
-    48.times do
-      random_colors << [rand(256), rand(256), rand(256)]
-    end
+    @xfix = -10
+    @yfix = -10
   end
 
   def fill_a_random_color(num)
@@ -29,8 +21,8 @@ class MancalaGameView
       8 => "red",
       9 => "teal",
       10 => "yellow",
-      11 => "teal",
-      12 => "yellow",
+      11 => "blue",
+      12 => "green",
     }
     bead = app.load_image("../resources/images/bead-#{colors[num]}.png", "png")
   end
@@ -59,15 +51,14 @@ class MancalaGameView
   def draw_x_beads(pit, n)
     for i in 0..(n-1) do
       bead = fill_a_random_color(i+1)
-      app.image(bead, pit.x+xfix+offsets[i][0], pit.y+yfix+i+offsets[i][1])
+      app.image(bead, pit.x+offsets[i][0], pit.y+offsets[i][1])
     end
   end
 
   def draw_many_beads(pit)
-
     for i in 0..8 do
       bead = fill_a_random_color(i+1)
-      app.image(bead, pit.x+xfix+offsets[i][0], pit.y+yfix+offsets[i][1])
+      app.image(bead, pit.x+offsets[i][0], pit.y+offsets[i][1])
     end
 
     app.fill 0
@@ -76,7 +67,7 @@ class MancalaGameView
   end
 
   def offsets
-    @offsets ||= [[25, 0], [-25, 0], [0, 25], [0, -25], [0,0], [-25, -25], [-25, 25], [25, -25], [25, 25]]
+    @offsets ||= [[0,0], [30, 0], [-30, 0], [0, 30], [0, -30], [-30, -30], [-30, 30], [30, -30], [30, 30]]
   end
 
   def draw_beads_in_store(store)
