@@ -6,13 +6,14 @@ class MancalaGameView
   # How do I render a pit with
   # 0,1,2,3,4,5,6,7,8 or more beads?
 
-  attr_reader :app
+  attr_reader :app, :offset
   attr_accessor :random_colors
 
   def initialize(app)
     @app ||= app
     @random_colors ||= []
     build_random_colors
+    @offset = 10
   end
 
   def build_random_colors
@@ -22,7 +23,21 @@ class MancalaGameView
   end
 
   def fill_a_random_color(num)
-    app.fill(random_colors[num][0], random_colors[num][1], random_colors[num][2])
+    colors = {
+      1 => "blue",
+      2 => "green",
+      3 => "red",
+      4 => "teal",
+      5 => "yellow",
+      6 => "blue",
+      7 => "green",
+      8 => "red",
+      9 => "teal",
+      10 => "yellow",
+      11 => "teal",
+      12 => "yellow",
+    }
+    bead = app.load_image("../resources/images/bead-#{colors[num]}.png", "png")
   end
 
   def draw_all_beads
@@ -77,27 +92,31 @@ class MancalaGameView
   end
 
   def draw_four_beads(pit)
-    fill_a_random_color(7)
-    app.ellipse pit.x-25, pit.y-25, 25, 25
-    fill_a_random_color(8)
-    app.ellipse pit.x+25, pit.y-25, 25, 25
-    fill_a_random_color(9)
-    app.ellipse pit.x-25, pit.y+25, 25, 25
-    fill_a_random_color(10)
-    app.ellipse pit.x+25, pit.y+25, 25, 25
+    bead = fill_a_random_color(1)
+    app.image(bead, pit.x-25-offset, pit.y-25-offset)
+
+    bead = fill_a_random_color(2)
+    app.image(bead, pit.x-25-offset, pit.y+25)
+
+    bead = fill_a_random_color(3)
+    app.image(bead, pit.x+25, pit.y-25-offset)
+
+    bead = fill_a_random_color(5)
+    app.image(bead, pit.x+25, pit.y+25)
   end
 
   def draw_five_beads(pit)
-    fill_a_random_color(11)
-    app.ellipse pit.x-37, pit.y-37, 25, 25
-    fill_a_random_color(12)
-    app.ellipse pit.x+37, pit.y-37, 25, 25
-    fill_a_random_color(1)
-    app.ellipse pit.x-37, pit.y+37, 25, 25
-    fill_a_random_color(2)
-    app.ellipse pit.x+37, pit.y+37, 25, 25
-    fill_a_random_color(3)
-    app.ellipse pit.x, pit.y, 25, 25
+    bead = fill_a_random_color(11)
+    app.image(bead, pit.x-37, pit.y-37)
+    #app.ellipse pit.x-37, pit.y-37, 25, 25
+    #fill_a_random_color(12)
+    #app.ellipse pit.x+37, pit.y-37, 25, 25
+    #fill_a_random_color(1)
+    #app.ellipse pit.x-37, pit.y+37, 25, 25
+    #fill_a_random_color(2)
+    #app.ellipse pit.x+37, pit.y+37, 25, 25
+    #fill_a_random_color(3)
+    #app.ellipse pit.x, pit.y, 25, 25
   end
 
   def draw_six_beads(pit)

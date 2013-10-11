@@ -8,19 +8,23 @@ class MancalaBoardView
 
   def draw_board
 
-    #box shadow
-    app.stroke 0
-    app.fill 106
-    app.rect 25, 55, 1385, 400
 
-    #main board
-    app.stroke 206
-    app.fill 256, 256, 256
-    app.rect 20, 50, 1385, 400
-    draw_title
+    bg = app.load_image("../resources/images/mancala-board.jpg", "jpg")
+    app.image(bg, 0, 0)
 
-    draw_pits
-    draw_stores
+    ###box shadow
+    ##app.stroke 0
+    ##app.fill 106
+    ##app.rect 25, 55, 1385, 400
+
+    ###main board
+    ##app.stroke 206
+    ##app.fill 256, 256, 256
+    ##app.rect 20, 50, 1385, 400
+    ##draw_title
+
+    ##draw_pits
+    ##draw_stores
   end
 
   def draw_pits
