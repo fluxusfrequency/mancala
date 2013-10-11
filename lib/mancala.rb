@@ -16,6 +16,7 @@ class Mancala < Processing::App
     @view = MancalaGameView.new(self)
     @model = MancalaModel.new(self)
     @ruler = MancalaKalahRules.new(self)
+    @controller = MancalaController.new(self)
   end
 
   def draw
@@ -27,7 +28,7 @@ class Mancala < Processing::App
   def mouse_pressed
     position = [mouse_x, mouse_y]
     controller.take_pit_if_available(position)
-    # ruler.check_and_execute_game_over
+    controller.check_for_game_over
   end
 
 end

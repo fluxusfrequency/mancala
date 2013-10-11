@@ -27,7 +27,6 @@ class MancalaKalahRules
     @extra_turn = false
   end
 
-
   def legal_pit?(pit_id, player)
     if app.model.find_pit_by_id(pit_id).empty?
       return false
@@ -42,20 +41,25 @@ class MancalaKalahRules
 
   def distribute_beads_from(pit_id, player)
     count = app.model.find_pit_by_id(pit_id).count
-    distribute_beads_for_player(player, pit_id, count)
+    distribute_beads_for_player(pit_id, player, count)
+    app.model.empty_pit(pit_id)
   end
 
-  def distribute_beads_for_player(player, first_pit_id, count)
+  def distribute_beads_for_player(first_pit_id, player, count)
     next_pit_id = app.model.find_next_pit_by_id(first_pit_id)
 
     @i = 0
-    while @i < count do
+    while @i <= count do
       execute_store_logic(next_pit_id, player, count)
       break if @i == count
       app.model.add_bead_to_pit(next_pit_id)
       next_pit_id = app.model.find_next_pit_by_id(next_pit_id)
       if @i == count - 1
-        take_both_sides(next_pit_id-1) if landed_on_empty?(next_pit_id-1)
+        landing_spot = next_pit_id - 1
+        landing_spot = 12 if landing_spot == 0
+        if landed_on_empty?(landing_spot) && app.model.find_all_pit_ids_on_players_side(player).include?(landing_spot)
+          take_both_sides(landing_spot)
+        end
       end
       @i += 1
     end
@@ -151,8 +155,8 @@ class MancalaKalahRules
   end
 
   def declare_winner
-    @winner = player_1 if player_1_won?
-    @winner = player_2 if player_2_won?
+    @winner = :player_1 if player_1_won?
+    @winner = :player_2 if player_2_won?
     @winner = :tie if tie?
     return
   end

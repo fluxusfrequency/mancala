@@ -26,12 +26,13 @@ class MancalaGameView
   end
 
   def draw_all_beads
-    app.controller.all.each do |pit|
+    app.model.all_pits.each do |pit|
       draw_beads_in_pit(pit)
     end
-    app.controller.all_stores.each do |store|
+    app.model.all_stores.each do |store|
       draw_beads_in_store(store)
     end
+    print_winner if app.ruler.game_over?
   end
 
   def draw_beads_in_pit(pit)
@@ -173,7 +174,7 @@ class MancalaGameView
   end
 
   def draw_beads_in_player_one_store
-    count =  app.controller.player_1_store.count
+    count = app.model.find_store_count_by_id(1)
     case count
     when 0
       return
@@ -187,7 +188,7 @@ class MancalaGameView
   end
 
   def draw_beads_in_player_two_store
-    count = app.controller.player_2_store.count
+    count = app.model.find_store_count_by_id(2)
     case count
     when 0
       return
@@ -208,12 +209,12 @@ class MancalaGameView
     app.text "Player two, your move!", 640, 475 if app.ruler.current_player.id == 2
   end
 
-  def print_winner(winner)
-    app.background 0,0,0
+  def print_winner
     app.textSize(56)
-    app.text "Player one is the winner!", 640, 475 if winner.id == 1
-    app.text "Player two is the winner!", 640, 475 if winner.id == 2
-    app.text "Tie Game!", 640, 475 if winner == :id
+    fill_a_random_color(rand(12))
+    app.text "Player one is the winner!", 640, 475 if app.ruler.winner == :player_1
+    app.text "Player two is the winner!", 400, 250 if app.ruler.winner == :player_2
+    app.text "Tie Game!", 640, 475 if app.ruler.winner == :id
   end
 
 end

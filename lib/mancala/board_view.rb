@@ -1,12 +1,5 @@
 class MancalaBoardView
 
-  # The Mancala 'board' is made up of two rows of six holes, or pits, each.
-  # Each player has a 'store' to the right side of the Mancala board.
-
-  # What does the board look like?
-  # What do the pits look like?
-  # What do the stores look like?
-
   attr_reader :app
 
   def initialize(app)
@@ -33,7 +26,7 @@ class MancalaBoardView
   def draw_pits
     app.stroke 0
     app.fill 225
-    app.controller.all.each do |pit|
+    app.model.all_pits.each do |pit|
       app.ellipse pit.x, pit.y, 150, 150
     end
   end

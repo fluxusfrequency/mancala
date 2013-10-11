@@ -75,7 +75,7 @@ class MancalaModel
   end
 
   def find_all_pits_by_count(count)
-    pit_counts[count]
+    pit_counts[count] || []
   end
 
   def find_pit_count_by_id(id)
@@ -119,7 +119,7 @@ class MancalaModel
   end
 
   def empty_pit_ids
-    find_all_pits_by_count(0).collect(&:id)
+    empty_pit_ids = find_all_pits_by_count(0).collect(&:id) || []
   end
 
   def empty_on_player_1_side?
@@ -155,6 +155,14 @@ class MancalaModel
       player_1_side_pits
     elsif player.id == 2
       player_2_side_pits
+    end
+  end
+
+  def find_all_pit_ids_on_players_side(player)
+    if player.id == 1
+      player_1_side_pit_ids
+    elsif player.id == 2
+      player_2_side_pit_ids
     end
   end
 
