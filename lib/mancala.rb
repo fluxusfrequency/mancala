@@ -20,9 +20,9 @@ class Mancala < Processing::App
   end
 
   def draw
-    view.invite_move
     board.draw_board
     view.draw_all_beads
+    view.invite_move
   end
 
   def mouse_pressed

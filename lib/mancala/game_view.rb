@@ -1,19 +1,14 @@
 class MancalaGameView
 
-  # Four pieces -- marbles or stones -- are placed in each of the 12 holes. The color of the pieces is irrelevant.
-
-  # What do the beads look like?
-  # How do I render a pit with
-  # 0,1,2,3,4,5,6,7,8 or more beads?
-
-  attr_reader :app, :offset
+  attr_reader :app, :xfix, :yfix
   attr_accessor :random_colors
 
   def initialize(app)
     @app ||= app
     @random_colors ||= []
     build_random_colors
-    @offset = 10
+    @xfix = -13
+    @yfix = -7
   end
 
   def build_random_colors
@@ -52,135 +47,36 @@ class MancalaGameView
 
   def draw_beads_in_pit(pit)
     app.fill 225
-    case pit.count
-    when 0 then draw_no_beads(pit)
-    when 1 then draw_one_bead(pit)
-    when 2 then draw_two_beads(pit)
-    when 3 then draw_three_beads(pit)
-    when 4 then draw_four_beads(pit)
-    when 5 then draw_five_beads(pit)
-    when 6 then draw_six_beads(pit)
+    n = pit.count
+    return if n == 0
+    if n >= 1 && n <= 9
+      draw_x_beads(pit, n)
     else
       draw_many_beads(pit)
     end
   end
 
-  def draw_no_beads(pit)
-    app.ellipse pit.x, pit.y, 150, 150
-  end
-
-  def draw_one_bead(pit)
-    fill_a_random_color(1)
-    app.ellipse pit.x, pit.y, 25, 25
-  end
-
-  def draw_two_beads(pit)
-    fill_a_random_color(2)
-    app.ellipse pit.x-25, pit.y, 25, 25
-    fill_a_random_color(3)
-    app.ellipse pit.x+25, pit.y, 25, 25
-  end
-
-  def draw_three_beads(pit)
-    # [x, y+37], [x-37, y-37], [x-37, y+37]
-    fill_a_random_color(4)
-    app.ellipse pit.x, pit.y, 25, 25
-    fill_a_random_color(5)
-    app.ellipse pit.x+37, pit.y-37, 25, 25
-    fill_a_random_color(6)
-    app.ellipse pit.x-37, pit.y+37, 25, 25
-  end
-
-  def draw_four_beads(pit)
-    bead = fill_a_random_color(1)
-    app.image(bead, pit.x-25-offset, pit.y-25-offset)
-
-    bead = fill_a_random_color(2)
-    app.image(bead, pit.x-25-offset, pit.y+25)
-
-    bead = fill_a_random_color(3)
-    app.image(bead, pit.x+25, pit.y-25-offset)
-
-    bead = fill_a_random_color(5)
-    app.image(bead, pit.x+25, pit.y+25)
-  end
-
-  def draw_five_beads(pit)
-    bead = fill_a_random_color(11)
-    app.image(bead, pit.x-37, pit.y-37)
-    #app.ellipse pit.x-37, pit.y-37, 25, 25
-    #fill_a_random_color(12)
-    #app.ellipse pit.x+37, pit.y-37, 25, 25
-    #fill_a_random_color(1)
-    #app.ellipse pit.x-37, pit.y+37, 25, 25
-    #fill_a_random_color(2)
-    #app.ellipse pit.x+37, pit.y+37, 25, 25
-    #fill_a_random_color(3)
-    #app.ellipse pit.x, pit.y, 25, 25
-  end
-
-  def draw_six_beads(pit)
-    fill_a_random_color(4)
-    app.ellipse pit.x-37, pit.y-37, 25, 25
-    fill_a_random_color(5)
-    app.ellipse pit.x, pit.y-37, 25, 25
-    fill_a_random_color(6)
-    app.ellipse pit.x+37, pit.y-37, 25, 25
-    fill_a_random_color(7)
-    app.ellipse pit.x-37, pit.y+37, 25, 25
-    fill_a_random_color(8)
-    app.ellipse pit.x, pit.y+37, 25, 25
-    fill_a_random_color(9)
-    app.ellipse pit.x+37, pit.y+37, 25, 25
+  def draw_x_beads(pit, n)
+    for i in 0..(n-1) do
+      bead = fill_a_random_color(i+1)
+      app.image(bead, pit.x+xfix+offsets[i][0], pit.y+yfix+i+offsets[i][1])
+    end
   end
 
   def draw_many_beads(pit)
-    fill_a_random_color(10)
-    app.ellipse pit.x-37, pit.y-37, 25, 25
-    fill_a_random_color(11)
-    app.ellipse pit.x-25, pit.y-25, 25, 25
-    fill_a_random_color(12)
-    app.ellipse pit.x-12, pit.y-12, 25, 25
-    fill_a_random_color(1)
-    app.ellipse pit.x, pit.y, 25, 25
-    fill_a_random_color(2)
-    app.ellipse pit.x+12, pit.y+12, 25, 25
-    fill_a_random_color(3)
-    app.ellipse pit.x+25, pit.y+25, 25, 25
-    fill_a_random_color(4)
-    app.ellipse pit.x+37, pit.y+37, 25, 25
-    fill_a_random_color(5)
-    app.ellipse pit.x-37, pit.y+37, 25, 25
-    fill_a_random_color(6)
-    app.ellipse pit.x-25, pit.y+25, 25, 25
-    fill_a_random_color(7)
-    app.ellipse pit.x-12, pit.y+12, 25, 25
-    fill_a_random_color(8)
-    app.ellipse pit.x, pit.y, 25, 25
-    fill_a_random_color(9)
-    app.ellipse pit.x-12, pit.y+12, 25, 25
-    fill_a_random_color(10)
-    app.ellipse pit.x-25, pit.y+25, 25, 25
-    fill_a_random_color(11)
-    app.ellipse pit.x-37, pit.y+37, 25, 25
-    fill_a_random_color(12)
-    app.ellipse pit.x+37, pit.y-37, 25, 25
-    fill_a_random_color(1)
-    app.ellipse pit.x+25, pit.y-25, 25, 25
-    fill_a_random_color(2)
-    app.ellipse pit.x+12, pit.y-12, 25, 25
-    fill_a_random_color(3)
-    app.ellipse pit.x, pit.y, 25, 25
-    fill_a_random_color(4)
-    app.ellipse pit.x+12, pit.y-12, 25, 25
-    fill_a_random_color(5)
-    app.ellipse pit.x+25, pit.y-25, 25, 25
-    fill_a_random_color(6)
-    app.ellipse pit.x+37, pit.y-37, 25, 25
+
+    for i in 0..8 do
+      bead = fill_a_random_color(i+1)
+      app.image(bead, pit.x+xfix+offsets[i][0], pit.y+yfix+offsets[i][1])
+    end
 
     app.fill 0
     app.textSize(56)
-    app.text "#{pit.count}", pit.x-10, pit.y-25
+    app.text "#{pit.count}", pit.x+xfix-10, pit.y+yfix-25
+  end
+
+  def offsets
+    @offsets ||= [[25, 0], [-25, 0], [0, 25], [0, -25], [0,0], [-25, -25], [-25, 25], [25, -25], [25, 25]]
   end
 
   def draw_beads_in_store(store)
@@ -198,7 +94,8 @@ class MancalaGameView
     when 0
       return
     when 1
-      app.ellipse 1330, 250, 25, 25
+      bead = fill_a_random_color(12)
+      app.image(bead, 1318, 238)
     else
       app.fill 0
       app.textSize(56)
@@ -212,7 +109,8 @@ class MancalaGameView
     when 0
       return
     when 1
-      app.ellipse 130, 250, 25, 25
+      bead = fill_a_random_color(12)
+      app.image(bead, 118, 238)
     else
       app.fill 0
       app.textSize(56)
@@ -221,11 +119,10 @@ class MancalaGameView
   end
 
   def invite_move
-    app.background 0,0,0
-    app.textSize(20)
-    app.fill 256, 256, 256
-    app.text "Player one, your move!", 640, 475 if app.ruler.current_player.id == 1
-    app.text "Player two, your move!", 640, 475 if app.ruler.current_player.id == 2
+    message_1 = app.load_image("../resources/images/move-player1.png", "png")
+    app.image(message_1, 530, 450) if app.ruler.current_player.id == 1
+    message_2 = app.load_image("../resources/images/move-player2.png", "png")
+    app.image(message_2, 530, 450) if app.ruler.current_player.id == 2
   end
 
   def print_winner
