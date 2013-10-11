@@ -159,7 +159,7 @@ class RulerTest < Minitest::Test
     model.empty_pit(5)
     model.empty_pit(6)
     ruler.execute_end_game
-    assert_equal ruler.player_2, ruler.winner
+    assert_equal :player_2, ruler.winner
   end
 
 
