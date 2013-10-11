@@ -59,6 +59,7 @@ class MancalaKalahRules
         landing_spot = 12 if landing_spot == 0
         if landed_on_empty?(landing_spot) && app.model.find_all_pit_ids_on_players_side(player).include?(landing_spot)
           take_both_sides(landing_spot)
+          break
         end
       end
       @i += 1
@@ -99,7 +100,10 @@ class MancalaKalahRules
 
   def take_that_side(pit_id)
     current_players_store.count += opposing_pit(pit_id).count
+    puts opposing_pit(pit_id).id
+    puts "before: #{app.model.find_pit_count_by_id(opposing_pit(pit_id).id)}"
     app.model.empty_pit(opposing_pit(pit_id).id)
+    puts "after: #{app.model.find_pit_count_by_id(opposing_pit(pit_id).id)}"
   end
 
   def opposing_pit(pit_id)
