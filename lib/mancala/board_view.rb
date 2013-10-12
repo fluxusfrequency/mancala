@@ -8,7 +8,7 @@ class MancalaBoardView
 
   def draw_board
     bg = app.load_image("../resources/images/mancala-board.jpg", "jpg")
-    app.image(bg, 0, 0)
+    app.image(bg, 10, 10)
   end
 
   def draw_pits
